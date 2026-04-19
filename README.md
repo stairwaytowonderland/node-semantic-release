@@ -103,18 +103,16 @@ jobs:
           echo "Created release ${{ steps.release.outputs.new-release-version }}"
 ```
 
-### Build and typecheck only (no release)
+### Build only (no release) and typecheck
+
+> [!TIP]
+> Useful for tests.
 
 ```yaml
-- uses: stairwaytowonderland/node-semantic-release@v1
+- uses: stairwaytowonderland/node-semantic-release@main
   with:
-    build-only: 'true'
-```
-
-```yaml
-- uses: stairwaytowonderland/node-semantic-release@v1
-  with:
-    typecheck: 'true'
+    build-only: true
+    typecheck: true
 ```
 
 ### Passing release notes downstream via `workflow_dispatch`
