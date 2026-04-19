@@ -1,6 +1,6 @@
 {
 	"name": "node-semantic-release",
-	"version": "0.0.0",
+	"version": "1.0.0",
 	"scripts": {
 		"build": "echo 'Nothing to build'"
 	},
