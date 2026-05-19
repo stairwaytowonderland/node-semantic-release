@@ -26,16 +26,16 @@ outputs:
   new-release-published:
     description: |
       'true' if a new release was published.
-    value: ${{ steps.export.outputs.new-release-published }}
+    value: ${{ steps.normalize.outputs.new-release-published }}
   new-release-version:
     description: Version number of the new release (e.g. 1.2.3).
-    value: ${{ steps.export.outputs.new-release-version }}
+    value: ${{ steps.normalize.outputs.new-release-version }}
   new-release-git-tag:
     description: Git tag of the new release (e.g. v1.2.3).
-    value: ${{ steps.export.outputs.new-release-git-tag }}
+    value: ${{ steps.normalize.outputs.new-release-git-tag }}
   new-release-notes:
     description: Release notes (Markdown) of the new release.
-    value: ${{ steps.export.outputs.new-release-notes }}
+    value: ${{ steps.normalize.outputs.new-release-notes }}
   new-release-notes-base64:
     description: Base64-encoded release notes.
     value: ${{ steps.encode.outputs.b64 }}
@@ -121,28 +121,29 @@ runs:
       env:
         GITHUB_TOKEN: ${{ inputs.github-token || github.token }}
 
-    - name: Export release data
+    - name: Normalize outputs
       if: inputs.build-only != 'true'
-      id: export
+      id: normalize
       shell: bash
       run: |
-        if [ -f .semantic-release-export-data.json ]; then
-          cat .semantic-release-export-data.json
-          version=$(jq -r .nextRelease.version .semantic-release-export-data.json)
-          tag=$(jq -r .nextRelease.gitTag .semantic-release-export-data.json)
-          notes=$(jq -r .nextRelease.notes .semantic-release-export-data.json)
-          published=$(jq -r .newReleasePublished .semantic-release-export-data.json)
-          echo "new-release-version=$version" >> $GITHUB_OUTPUT
-          echo "new-release-git-tag=$tag" >> $GITHUB_OUTPUT
-          echo "new-release-notes=$notes" >> $GITHUB_OUTPUT
-          echo "new-release-published=$published" >> $GITHUB_OUTPUT
-        else
-          echo "::error::.semantic-release-export-data.json not found. Ensure 'semantic-release-export-data' is configured as a plugin in your semantic-release config and that semantic-release ran successfully."
-          exit 1
-        fi
+        echo "new-release-published=${{ steps.release.outputs.new-release-published || steps.get-next-version.outputs.new-release-published }}" >> "$GITHUB_OUTPUT"
+        echo "new-release-version=${{ steps.release.outputs.new-release-version || steps.get-next-version.outputs.new-release-version }}" >> "$GITHUB_OUTPUT"
+        echo "new-release-git-tag=${{ steps.release.outputs.new-release-git-tag || steps.get-next-version.outputs.new-release-git-tag }}" >> "$GITHUB_OUTPUT"
+        echo "new-release-notes=${{ steps.release.outputs.new-release-notes || steps.get-next-version.outputs.new-release-notes }}" >> "$GITHUB_OUTPUT"
+
+    - name: Create JSON file
+      if: steps.normalize.outputs.new-release-published == 'true' && inputs.build-only != 'true' && inputs.manual-tag == 'true'
+      shell: bash
+      run: |
+        echo '{
+          "published": ${{ steps.normalize.outputs.new-release-published }},
+          "version": "${{ steps.normalize.outputs.new-release-version }}",
+          "gitTag": "${{ steps.normalize.outputs.new-release-git-tag }}",
+          "notes": "${{ steps.normalize.outputs.new-release-notes }}"
+        }' > release.json
 
     - name: Configure git
-      if: inputs.build-only != 'true' && inputs.manual-tag == 'true'
+      if: steps.normalize.outputs.new-release-published == 'true' && inputs.build-only != 'true' && inputs.manual-tag == 'true'
       shell: bash
       run: |
         git config --global user.name "github-actions[bot]"
@@ -154,13 +155,13 @@ runs:
         GITHUB_TOKEN: ${{ inputs.github-token || github.token }}
 
     - name: Create tag
-      if: inputs.build-only != 'true' && steps.export.outputs.new-release-git-tag != '' && inputs.manual-tag == 'true'
+      if: steps.normalize.outputs.new-release-git-tag != '' && inputs.build-only != 'true' && inputs.manual-tag == 'true'
       shell: bash
       run: |
-        git tag -a ${{ steps.export.outputs.new-release-git-tag }} ${{ github.sha }} -m "$NOTES"
-        git push origin ${{ steps.export.outputs.new-release-git-tag }}
+        git tag -a ${{ steps.normalize.outputs.new-release-git-tag }} ${{ github.sha }} -m "$NOTES"
+        git push origin ${{ steps.normalize.outputs.new-release-git-tag }}
       env:
-        NOTES: ${{ steps.export.outputs.new-release-notes }}
+        NOTES: ${{ steps.normalize.outputs.new-release-notes }}
 
     - name: Encode release notes
       if: steps.release.outputs.new-release-published == 'true' && inputs.build-only != 'true' && inputs.manual-tag != 'true'
