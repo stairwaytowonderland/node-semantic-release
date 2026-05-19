@@ -47,7 +47,7 @@ runs:
       with:
         # fetch-depth: 0
         ref: ${{ github.action_ref }}
-        token: ${{ inputs.github-token }}
+        # token: ${{ inputs.github-token }}
         repository: ${{ github.action_repository }}
         path: ./.node-semantic-release
 
@@ -79,12 +79,12 @@ runs:
       shell: bash
       run: npm run typecheck
 
-    - name: Check token
-      if: inputs.build-only != 'true' && inputs.github-token == ''
-      shell: bash
-      run: |
-        echo "::error::github-token input is required to publish a release. Provide a token with repo + write access."
-        exit 1
+    # - name: Check token
+    #   if: inputs.build-only != 'true' && inputs.github-token == ''
+    #   shell: bash
+    #   run: |
+    #     echo "::error::github-token input is required to publish a release. Provide a token with repo + write access."
+    #     exit 1
 
     - name: Check 'semantic-release-export-data' plugin
       if: inputs.build-only != 'true'
