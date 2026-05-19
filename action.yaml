@@ -127,6 +127,7 @@ runs:
       shell: bash
       run: |
         if [ -f .semantic-release-export-data.json ]; then
+          cat .semantic-release-export-data.json
           version=$(jq -r .nextRelease.version .semantic-release-export-data.json)
           tag=$(jq -r .nextRelease.gitTag .semantic-release-export-data.json)
           notes=$(jq -r .nextRelease.notes .semantic-release-export-data.json)
@@ -135,6 +136,9 @@ runs:
           echo "new-release-git-tag=$tag" >> $GITHUB_OUTPUT
           echo "new-release-notes=$notes" >> $GITHUB_OUTPUT
           echo "new-release-published=$published" >> $GITHUB_OUTPUT
+        else
+          echo "::error::.semantic-release-export-data.json not found. Ensure 'semantic-release-export-data' is configured as a plugin in your semantic-release config and that semantic-release ran successfully."
+          exit 1
         fi
 
     - name: Configure git
