@@ -21,13 +21,13 @@ jobs:
         uses: actions/checkout@v6
         with:
           fetch-depth: 0
-          token: ${{ secrets.GH_PAT_CREATE_REPO }}
+          token: ${{ github.token }}
 
       - name: Semantic release
         id: release
         uses: ./
         with:
-          github-token: ${{ secrets.GH_PAT_CREATE_REPO }}
+          github-token: ${{ github.token }}
 
       - name: Dispatch Publish workflow
         if: steps.release.outputs.new-release-published == 'true'
