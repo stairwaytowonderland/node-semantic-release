@@ -32,11 +32,8 @@ jobs:
       - name: Semantic release
         id: release
         uses: ./
-        # with:
-        #   github-token: ${{ secrets.GH_PAT_CREATE_RELEASE }}
-
-        env:
-          GITHUB_TOKEN: ${{ secrets.GH_PAT_CREATE_RELEASE }}
+        with:
+          github-token: ${{ secrets.GH_PAT_CREATE_RELEASE }}
 
       - name: Dispatch Publish workflow
         if: steps.release.outputs.new-release-published == 'true'
