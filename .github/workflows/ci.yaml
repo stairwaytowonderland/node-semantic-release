@@ -15,6 +15,6 @@ jobs:
     with:
       # dispatch-workflow: publish.yaml
       fail-on-no-release: true
-      # manual-tag: true
+      manual-tag: true
     secrets:
       github-token: ${{ secrets.GH_PAT_CREATE_RELEASE }}
