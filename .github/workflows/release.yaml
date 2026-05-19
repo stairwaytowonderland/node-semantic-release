@@ -75,7 +75,7 @@ jobs:
           manual-tag: ${{ inputs.manual-tag }}
 
       - name: Release failed
-        if: steps.release.outputs.next-release-version == '' && inputs.fail-on-no-release
+        if: ! steps.release.outputs.new-release-published && inputs.fail-on-no-release
         uses: actions/github-script@v9
         with:
           script: |
