@@ -139,10 +139,10 @@ runs:
       id: normalize
       shell: bash
       run: |
-        echo "new-release-published=${{ steps.release.outputs.new-release-published || (steps.get-next-version.outputs.next-release-version != '') }}" >> "$GITHUB_OUTPUT"
-        echo "new-release-version=${{ steps.release.outputs.new-release-version || steps.get-next-version.outputs.next-release-version }}" >> "$GITHUB_OUTPUT"
-        echo "new-release-git-tag=${{ steps.release.outputs.new-release-git-tag || steps.get-next-version.outputs.next-release-git-tag }}" >> "$GITHUB_OUTPUT"
-        echo "new-release-notes=${{ steps.release.outputs.new-release-notes || steps.get-next-version.outputs.next-release-notes }}" >> "$GITHUB_OUTPUT"
+        echo "new-release-published=${{ steps.release.outputs.new-release-published || (steps.get-next-version.outputs.new-release-version != '') }}" >> "$GITHUB_OUTPUT"
+        echo "new-release-version=${{ steps.release.outputs.new-release-version || steps.get-next-version.outputs.new-release-version }}" >> "$GITHUB_OUTPUT"
+        echo "new-release-git-tag=${{ steps.release.outputs.new-release-git-tag || steps.get-next-version.outputs.new-release-git-tag }}" >> "$GITHUB_OUTPUT"
+        echo "new-release-notes=${{ steps.release.outputs.new-release-notes || steps.get-next-version.outputs.new-release-notes }}" >> "$GITHUB_OUTPUT"
 
     - name: Show outputs
       if: inputs.build-only != 'true'
