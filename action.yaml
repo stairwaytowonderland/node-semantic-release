@@ -138,6 +138,9 @@ runs:
         # git config --global user.email "${{ github.actor }}@users.noreply.github.com"
         git config --global user.name "github-actions[bot]"
         git config --global user.email "41898282+github-actions[bot]@users.noreply.github.com"
+        git config --global url."https://${GITHUB_TOKEN}@github.com/".insteadOf "https://github.com/"
+      env:
+        GITHUB_TOKEN: ${{ inputs.github-token || github.token }}
 
     - name: Create tag
       if: inputs.build-only != 'true' && steps.normalize.outputs.new-release-git-tag != '' && inputs.manual-tag == 'true'
