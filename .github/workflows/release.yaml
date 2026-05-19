@@ -1,9 +1,18 @@
 name: Release
 
 on:
-  push:
-    branches: [main]
-  workflow_dispatch:
+  # push:
+  #   branches: [main]
+  # workflow_dispatch:
+  workflow_call:
+    secrets:
+      github-token:
+        description: 'GitHub Personal Access Token with repo scope for creating releases.'
+        required: false
+
+env:
+  # TOKEN: ${{ secrets.token || secrets.GH_PAT_CREATE_RELEASE }}
+  TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
 jobs:
   release:
@@ -17,11 +26,19 @@ jobs:
       pull-requests: write
 
     steps:
+      - name: Setup | Set TOKEN env var
+        run: |
+          if [ -n "${{ secrets.github-token }}" ]; then
+            echo "TOKEN=${{ secrets.github-token }}" >> $GITHUB_ENV
+          elif [ -n "${{ github.event.inputs.secret-token-name }}" ]; then
+            echo "TOKEN=${{ secrets[github.event.inputs.secret-token-name] }}" >> $GITHUB_ENV
+          fi
+
       - name: Checkout
         uses: actions/checkout@v6
         with:
           fetch-depth: 0
-          token: ${{ github.token }}
+          token: ${{ env.TOKEN }}
           persist-credentials: false
 
       - name: Force branch to workflow SHA
@@ -33,7 +50,7 @@ jobs:
         id: release
         uses: ./
         with:
-          github-token: ${{ secrets.GH_PAT_CREATE_RELEASE }}
+          github-token: ${{ env.TOKEN }}
 
       - name: Dispatch Publish workflow
         if: steps.release.outputs.new-release-published == 'true'

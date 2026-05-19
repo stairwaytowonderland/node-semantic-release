@@ -1,0 +1,15 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+  workflow_dispatch:
+
+jobs:
+  release:
+    name: Release
+    uses: ./.github/workflows/release.yaml
+    secrets:
+      github-token: ${{ secrets.GH_PAT_CREATE_RELEASE }}
