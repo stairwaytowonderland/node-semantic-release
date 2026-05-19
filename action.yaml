@@ -42,7 +42,7 @@ outputs:
 runs:
   using: composite
   steps:
-    - name: Ensure TOKEN environment variable
+    - name: Check/set GITHUB_TOKEN environment variable
       shell: bash
       run: |
         if [ -n "${{ inputs.github-token }}" ]; then
