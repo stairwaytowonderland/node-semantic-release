@@ -11,8 +11,8 @@ on:
         type: string
         required: false
         default: ''
-      dry-run:
-        description: 'Run semantic-release in dry-run mode (for testing).'
+      manual-tag:
+        description: 'Manually create the release tag instead of letting semantic-release do it.'
         type: boolean
         required: false
         default: false
@@ -72,10 +72,10 @@ jobs:
         uses: ./
         with:
           github-token: ${{ env.TOKEN }}
-          dry-run: ${{ inputs.dry-run }}
+          manual-tag: ${{ inputs.manual-tag }}
 
       - name: Release failed
-        if: steps.release.outputs.next-release-version == '' && inputs.fail-on-no-release == 'true'
+        if: steps.release.outputs.new-release-version == '' && inputs.fail-on-no-release == 'true'
         uses: actions/github-script@v9
         with:
           script: |

@@ -16,8 +16,8 @@ inputs:
     description: Run the build step but skip the release step (for testing).
     required: false
     default: 'false'
-  dry-run:
-    description: Run semantic-release in dry-run mode (for testing).
+  manual-tag:
+    description: Manually create the release tag instead of letting semantic-release do it.
     required: false
     default: 'false'
   typecheck:
@@ -118,7 +118,7 @@ runs:
         fi
 
     - name: Get next version
-      if: inputs.build-only != 'true' && inputs.dry-run == 'true'
+      if: inputs.build-only != 'true' && inputs.manual-tag == 'true'
       id: get-next-version
       shell: bash
       run: npx semantic-release --dry-run
@@ -126,7 +126,7 @@ runs:
         GITHUB_TOKEN: ${{ env.TOKEN }}
 
     - name: Release
-      if: inputs.build-only != 'true' && inputs.dry-run != 'true'
+      if: inputs.build-only != 'true' && inputs.manual-tag != 'true'
       id: release
       shell: bash
       run: npx semantic-release
@@ -138,19 +138,19 @@ runs:
       id: normalize
       shell: bash
       run: |
-        echo "new-release-published=${{ steps.release.outputs.new-release-published || (steps.get-next-version.outputs.new-release-version != '') }}" >> "$GITHUB_OUTPUT"
+        echo "new-release-published=${{ steps.release.outputs.new-release-published || steps.get-next-version.outputs.new-release-published }}" >> "$GITHUB_OUTPUT"
         echo "new-release-version=${{ steps.release.outputs.new-release-version || steps.get-next-version.outputs.new-release-version }}" >> "$GITHUB_OUTPUT"
         echo "new-release-git-tag=${{ steps.release.outputs.new-release-git-tag || steps.get-next-version.outputs.new-release-git-tag }}" >> "$GITHUB_OUTPUT"
 
     - name: Create tag
-      if: inputs.build-only != 'true' && inputs.dry-run != 'true' && steps.release.outputs.new-release-git-tag != ''
+      if: inputs.build-only != 'true' && inputs.manual-tag != 'true' && steps.release.outputs.new-release-git-tag != ''
       shell: bash
       run: git tag -a ${{ steps.release.outputs.new-release-git-tag }} ${{ github.sha }} -m "$NOTES"
       env:
         NOTES: ${{ steps.release.outputs.new-release-notes }}
 
     - name: Encode release notes
-      if: steps.release.outputs.new-release-published == 'true' && inputs.build-only != 'true' && inputs.dry-run != 'true'
+      if: steps.release.outputs.new-release-published == 'true' && inputs.build-only != 'true' && inputs.manual-tag != 'true'
       id: encode
       shell: bash
       # Encode the new release notes as a base64 string to safely
