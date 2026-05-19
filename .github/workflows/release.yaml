@@ -33,7 +33,8 @@ jobs:
         id: release
         uses: ./
         with:
-          github-token: ${{ secrets.GH_PAT_CREATE_RELEASE }}
+          build-only: 'true' # Skip the actual release step for testing.
+          # github-token: ${{ secrets.GH_PAT_CREATE_RELEASE }}
 
       - name: Dispatch Publish workflow
         if: steps.release.outputs.new-release-published == 'true'
