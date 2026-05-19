@@ -136,7 +136,9 @@ runs:
       shell: bash
       # Encode the new release notes as a base64 string to safely
       # pass through the workflow dispatch fields.
-      run: printf '%s' "$NOTES" | base64 -w 0 | xargs -I{} echo "notes_b64={}" >> "$GITHUB_OUTPUT"
+      run: |
+        echo "Encoding release notes for transport..."
+        printf '%s' "$NOTES" | base64 -w 0 | xargs -I{} echo "notes_b64={}" >> "$GITHUB_OUTPUT"
       # The release notes from steps.normalize.outputs.new-release-notes
       # can contain arbitrary Markdown — newlines, special characters,
       # quotes — that would break if interpolated directly into the run
