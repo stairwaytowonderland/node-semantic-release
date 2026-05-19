@@ -42,6 +42,13 @@ outputs:
 runs:
   using: composite
   steps:
+    - name: Ensure TOKEN environment variable
+      shell: bash
+      run: |
+        if [ -n "${{ inputs.github-token }}" ]; then
+          echo "GITHUB_TOKEN=${{ inputs.github-token }}" >> $GITHUB_ENV
+        fi
+
     - name: Checkout action repository
       uses: actions/checkout@v6
       with:

@@ -22,6 +22,7 @@ jobs:
         with:
           fetch-depth: 0
           token: ${{ github.token }}
+          persist-credentials: false
 
       - name: Force branch to workflow SHA
         shell: bash
