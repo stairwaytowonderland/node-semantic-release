@@ -38,7 +38,7 @@ outputs:
   #   value: ${{ steps.normalize.outputs.new-release-notes }}
   new-release-notes-base64:
     description: Base64-encoded release notes.
-    value: ${{ steps.encode.outputs.b64 }}
+    value: ${{ steps.encode.outputs.notes_b64 }}
 
 runs:
   using: composite
@@ -129,7 +129,21 @@ runs:
         echo "new-release-published=${{ steps.release.outputs.new-release-published || steps.get-next-version.outputs.new-release-published }}" >> "$GITHUB_OUTPUT"
         echo "new-release-version=${{ steps.release.outputs.new-release-version || steps.get-next-version.outputs.new-release-version }}" >> "$GITHUB_OUTPUT"
         echo "new-release-git-tag=${{ steps.release.outputs.new-release-git-tag || steps.get-next-version.outputs.new-release-git-tag }}" >> "$GITHUB_OUTPUT"
-        echo "NOTES=${{ steps.release.outputs.new-release-notes || steps.get-next-version.outputs.new-release-notes }}" >> "$GITHUB_ENV"
+
+    - name: Encode release notes
+      if: steps.normalize.outputs.new-release-published == 'true' && inputs.build-only != 'true' && inputs.manual-tag != 'true'
+      id: encode
+      shell: bash
+      # Encode the new release notes as a base64 string to safely
+      # pass through the workflow dispatch fields.
+      run: printf '%s' "$NOTES" | base64 -w 0 | xargs -I{} echo "notes_b64={}" >> "$GITHUB_OUTPUT"
+      # The release notes from steps.normalize.outputs.new-release-notes
+      # can contain arbitrary Markdown — newlines, special characters,
+      # quotes — that would break if interpolated directly into the run
+      # command via ${{ }}. Passing it through an environment variable
+      # lets the shell handle it safely as a raw string.
+      env:
+        NOTES: ${{ steps.normalize.outputs.new-release-notes }}
 
     - name: Create JSON file
       if: steps.normalize.outputs.new-release-published == 'true' && inputs.build-only != 'true' && inputs.manual-tag == 'true'
@@ -139,7 +153,7 @@ runs:
           "published": ${{ steps.normalize.outputs.new-release-published }},
           "version": "${{ steps.normalize.outputs.new-release-version }}",
           "gitTag": "${{ steps.normalize.outputs.new-release-git-tag }}",
-          "notes": "$NOTES"
+          "notes": "${{ steps.encode.outputs.notes_b64 }}"
         }' > release.json
 
     - name: Configure git
@@ -158,25 +172,11 @@ runs:
       if: steps.normalize.outputs.new-release-git-tag != '' && inputs.build-only != 'true' && inputs.manual-tag == 'true'
       shell: bash
       run: |
+        NOTES=$(printf '%b' "$NOTES_B64" | base64 -d)
         git tag -a ${{ steps.normalize.outputs.new-release-git-tag }} ${{ github.sha }} -m "$NOTES"
         git push origin ${{ steps.normalize.outputs.new-release-git-tag }}
-      # env:
-      #   NOTES: ${{ steps.normalize.outputs.new-release-notes }}
-
-    - name: Encode release notes
-      if: steps.release.outputs.new-release-published == 'true' && inputs.build-only != 'true' && inputs.manual-tag != 'true'
-      id: encode
-      shell: bash
-      # Encode the new release notes as a base64 string to safely
-      # pass through the workflow dispatch fields.
-      run: printf '%s' "$NOTES" | base64 -w 0 | xargs -I{} echo "b64={}" >> "$GITHUB_OUTPUT"
-      # The release notes from steps.release.outputs.new-release-notes
-      # can contain arbitrary Markdown — newlines, special characters,
-      # quotes — that would break if interpolated directly into the run
-      # command via ${{ }}. Passing it through an environment variable
-      # lets the shell handle it safely as a raw string.
-      # env:
-      #   NOTES: ${{ steps.release.outputs.new-release-notes }}
+      env:
+        NOTES_B64: ${{ steps.encode.outputs.notes_b64 }}
 
 branding:
   icon: tag
