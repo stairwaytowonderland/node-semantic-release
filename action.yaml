@@ -16,6 +16,10 @@ inputs:
     description: Run the build step but skip the release step (for testing).
     required: false
     default: 'false'
+  dry-run:
+    description: Run semantic-release in dry-run mode (for testing).
+    required: false
+    default: 'false'
   typecheck:
     description: Run typechecking but skip the release step (for testing).
     required: false
@@ -25,16 +29,16 @@ outputs:
   new-release-published:
     description: |
       'true' if a new release was published.
-    value: ${{ steps.release.outputs.new-release-published }}
+    value: ${{ steps.normalize.outputs.new-release-published }}
   new-release-version:
     description: Version number of the new release (e.g. 1.2.3).
-    value: ${{ steps.release.outputs.new-release-version }}
+    value: ${{ steps.normalize.outputs.new-release-version }}
   new-release-git-tag:
     description: Git tag of the new release (e.g. v1.2.3).
-    value: ${{ steps.release.outputs.new-release-git-tag }}
+    value: ${{ steps.normalize.outputs.new-release-git-tag }}
   new-release-notes:
     description: Release notes (Markdown) of the new release.
-    value: ${{ steps.release.outputs.new-release-notes }}
+    value: ${{ steps.normalize.outputs.new-release-notes }}
   new-release-notes-base64:
     description: Base64-encoded release notes.
     value: ${{ steps.encode.outputs.b64 }}
@@ -113,16 +117,44 @@ runs:
           cp ./.node-semantic-release/templates/releaserc.json ./.releaserc
         fi
 
+    - name: Get next version
+      if: inputs.build-only != 'true' && inputs.dry-run == 'true'
+      id: get-next-version
+      shell: bash
+      run: |
+        npx semantic-release --dry-run
+      env:
+        GITHUB_TOKEN: ${{ env.TOKEN }}
+
     - name: Release
-      if: inputs.build-only != 'true'
+      if: inputs.build-only != 'true' && inputs.dry-run != 'true'
       id: release
       shell: bash
       run: npx semantic-release
       env:
         GITHUB_TOKEN: ${{ env.TOKEN }}
 
+    - name: Normalize outputs
+      if: inputs.build-only != 'true'
+      id: normalize
+      shell: bash
+      run: |
+        echo "new-release-published=${{ steps.release.outputs.new-release-published || (steps.get-next-version.outputs.next-release-version != '') }}" >> "$GITHUB_OUTPUT"
+        echo "new-release-version=${{ steps.release.outputs.new-release-version || steps.get-next-version.outputs.next-release-version }}" >> "$GITHUB_OUTPUT"
+        echo "new-release-git-tag=${{ steps.release.outputs.new-release-git-tag || steps.get-next-version.outputs.next-release-git-tag }}" >> "$GITHUB_OUTPUT"
+        echo "new-release-notes=${{ steps.release.outputs.new-release-notes || steps.get-next-version.outputs.next-release-notes }}" >> "$GITHUB_OUTPUT"
+
+    - name: Show outputs
+      if: inputs.build-only != 'true'
+      shell: bash
+      run: |
+        echo "Next release version: ${{ steps.normalize.outputs.new-release-version }}"
+        echo "Next release git tag: ${{ steps.normalize.outputs.new-release-git-tag }}"
+        echo "Next release notes: ${{ steps.normalize.outputs.new-release-notes }}"
+        echo "New release will be published: ${{ steps.normalize.outputs.new-release-published }}"
+
     - name: Encode release notes
-      if: steps.release.outputs.new-release-published == 'true' && inputs.build-only != 'true'
+      if: steps.release.outputs.new-release-published == 'true' && inputs.build-only != 'true' && inputs.dry-run != 'true'
       id: encode
       shell: bash
       # Encode the new release notes as a base64 string to safely

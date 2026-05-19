@@ -11,6 +11,16 @@ on:
         type: string
         required: false
         default: ''
+      dry-run:
+        description: 'Run semantic-release in dry-run mode (for testing).'
+        type: boolean
+        required: false
+        default: false
+      fail-on-no-release:
+        description: 'Fail the workflow if no release is published (e.g. if there are no relevant commits).'
+        type: boolean
+        required: false
+        default: false
     secrets:
       github-token:
         description: 'GitHub Personal Access Token with repo scope for creating releases.'
@@ -29,6 +39,12 @@ jobs:
       contents: write
       issues: write
       pull-requests: write
+
+    outputs:
+      new-release-published: ${{ steps.release.outputs.new-release-published }}
+      new-release-version: ${{ steps.release.outputs.new-release-version }}
+      new-release-git-tag: ${{ steps.release.outputs.new-release-git-tag }}
+      new-release-notes: ${{ steps.release.outputs.new-release-notes }}
 
     steps:
       - name: Setup | Set TOKEN env var
@@ -56,6 +72,14 @@ jobs:
         uses: ./
         with:
           github-token: ${{ env.TOKEN }}
+          dry-run: ${{ inputs.dry-run }}
+
+      - name: Release failed
+        if: steps.release.outputs.next-release-version == '' && inputs.fail-on-no-release == 'true'
+        uses: actions/github-script@v9
+        with:
+          script: |
+            core.setFailed('Release failed')
 
       - name: Dispatch Publish workflow
         if: steps.release.outputs.new-release-published == 'true' && inputs.dispatch-workflow != ''
