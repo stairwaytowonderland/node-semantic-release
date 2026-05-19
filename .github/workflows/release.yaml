@@ -17,8 +17,7 @@ on:
         required: false
 
 env:
-  # TOKEN: ${{ secrets.token || secrets.GH_PAT_CREATE_RELEASE }}
-  TOKEN: ${{ secrets.GITHUB_TOKEN }}
+  TOKEN: ${{ secrets.github-token }}
 
 jobs:
   release:

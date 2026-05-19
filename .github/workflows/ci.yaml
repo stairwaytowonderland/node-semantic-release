@@ -5,6 +5,9 @@ on:
     branches: [main]
   workflow_dispatch:
 
+# Use PAT instead of GITHUB_TOKEN to cause semantic-release to trigger tag pipeline when tag is created.
+# 'Fine-grained token' repo permissions: Contents
+
 jobs:
   release:
     name: Release
