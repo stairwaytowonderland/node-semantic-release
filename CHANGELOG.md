@@ -1,3 +1,23 @@
+## [1.3.0](https://github.com/stairwaytowonderland/node-semantic-release/compare/v1.2.0...v1.3.0) (2026-05-19)
+
+### ✨ Features
+
+* adding tempplates; referencing action_ref for shared action checkout ([a1550be](https://github.com/stairwaytowonderland/node-semantic-release/commit/a1550be0971231066104e76a240da95eeb3d7c7a))
+* update token ([8c90cd0](https://github.com/stairwaytowonderland/node-semantic-release/commit/8c90cd0d3c34a0f72c034eaed95a06dceec278d7))
+* update token ([2077662](https://github.com/stairwaytowonderland/node-semantic-release/commit/2077662fa58fb7331b443cc8d296c2a6d999533f))
+* update token ([00ddf87](https://github.com/stairwaytowonderland/node-semantic-release/commit/00ddf8717d1a438c0e65d7aee594ee03b351616a))
+* update token ([bd15ad3](https://github.com/stairwaytowonderland/node-semantic-release/commit/bd15ad3a319482886f70290d11c97b1b017468ee))
+* update token ([36c4165](https://github.com/stairwaytowonderland/node-semantic-release/commit/36c4165b5183bc765a3108025ceb5f359528ee39))
+* update token ([38dd9bc](https://github.com/stairwaytowonderland/node-semantic-release/commit/38dd9bc06ba55234424dcf834de0ecc980709e96))
+
+### 📚 Documentation
+
+* update README.md ([a3fa78c](https://github.com/stairwaytowonderland/node-semantic-release/commit/a3fa78c80d05564b02f5ec40d3db914c30e6f5bb))
+
+### 🔄 CI/CD
+
+* update reference workflow-dispatch -> simple-workflow-dispatch ([b6246fd](https://github.com/stairwaytowonderland/node-semantic-release/commit/b6246fdda0221d9f69f8afae292a30ca4391aa11))
+
 ## [1.2.0](https://github.com/stairwaytowonderland/node-semantic-release/compare/v1.1.0...v1.2.0) (2026-04-19)
 
 ### ✨ Features
