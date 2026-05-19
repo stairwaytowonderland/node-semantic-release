@@ -1,3 +1,11 @@
+## [1.8.0](https://github.com/stairwaytowonderland/node-semantic-release/compare/v1.7.0...v1.8.0) (2026-05-19)
+
+### ✨ Features
+
+* test token logic ([6ccaaf0](https://github.com/stairwaytowonderland/node-semantic-release/commit/6ccaaf05d94a6e26ec7886649574f3344c4462eb))
+* test token logic ([b053c4f](https://github.com/stairwaytowonderland/node-semantic-release/commit/b053c4fada3eea2cb45f0e1659517716ec632274))
+* test token logic ([350f94e](https://github.com/stairwaytowonderland/node-semantic-release/commit/350f94ef5e8c479dca106170a37de8dc7d959cc9))
+
 ## [1.7.0](https://github.com/stairwaytowonderland/node-semantic-release/compare/v1.6.0...v1.7.0) (2026-05-19)
 
 ### ✨ Features
