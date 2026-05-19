@@ -11,5 +11,5 @@ jobs:
     uses: ./.github/workflows/release.yaml
     # with:
     #   dispatch-workflow: publish.yaml
-    # secrets:
-    #   github-token: ${{ secrets.GH_PAT_CREATE_RELEASE }}
+    secrets:
+      github-token: ${{ secrets.GH_PAT_CREATE_RELEASE }}
