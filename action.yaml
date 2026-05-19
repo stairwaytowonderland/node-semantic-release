@@ -42,11 +42,40 @@ outputs:
 runs:
   using: composite
   steps:
+    - name: Checkout action repository
+      uses: actions/checkout@v6
+      with:
+        # fetch-depth: 0
+        ref: ${{ github.action_ref }}
+        token: ${{ inputs.github-token }}
+        repository: ${{ github.action_repository }}
+        path: ./.node-semantic-release
+
+    - name: Checkout target repository
+      uses: actions/checkout@v6
+      with:
+        fetch-depth: 0
+        token: ${{ env.TOKEN }}
+
+    - name: Force branch to workflow SHA
+      shell: bash
+      # Guards against commits landing while this run was queued.
+      run: git reset --hard ${{ github.sha }}
+
     - name: Setup Node.js
       uses: actions/setup-node@v6
       with:
         node-version: ${{ inputs.node-version }}
         cache: npm
+
+    - name: Ensure package.json
+      shell: bash
+      run: |
+        if [ ! -f package.json ]; then
+          echo "::warning::package.json not found. Copying default configuration."
+          cp ./.node-semantic-release/templates/package.json ./package.json
+          npm install --package-lock-only
+        fi
 
     - name: Install dependencies
       shell: bash
@@ -75,6 +104,15 @@ runs:
         if ! node -e "require('semantic-release-export-data')" 2>/dev/null; then
           echo "::error::semantic-release-export-data is not installed. Add it to package.json and ensure it is listed in your semantic-release plugins (e.g. '.releaserc')."
           exit 1
+        fi
+
+    - name: Ensure .releaserc
+      if: inputs.build-only != 'true'
+      shell: bash
+      run: |
+        if [ ! -f .releaserc ]; then
+          echo "::warning::.releaserc not found. Copying default configuration."
+          cp ./.node-semantic-release/templates/releaserc.json ./.releaserc
         fi
 
     - name: Release
