@@ -33,9 +33,9 @@ outputs:
   new-release-git-tag:
     description: Git tag of the new release (e.g. v1.2.3).
     value: ${{ steps.normalize.outputs.new-release-git-tag }}
-  new-release-notes:
-    description: Release notes (Markdown) of the new release.
-    value: ${{ steps.normalize.outputs.new-release-notes }}
+  # new-release-notes:
+  #   description: Release notes (Markdown) of the new release.
+  #   value: ${{ steps.normalize.outputs.new-release-notes }}
   new-release-notes-base64:
     description: Base64-encoded release notes.
     value: ${{ steps.encode.outputs.b64 }}
@@ -129,7 +129,7 @@ runs:
         echo "new-release-published=${{ steps.release.outputs.new-release-published || steps.get-next-version.outputs.new-release-published }}" >> "$GITHUB_OUTPUT"
         echo "new-release-version=${{ steps.release.outputs.new-release-version || steps.get-next-version.outputs.new-release-version }}" >> "$GITHUB_OUTPUT"
         echo "new-release-git-tag=${{ steps.release.outputs.new-release-git-tag || steps.get-next-version.outputs.new-release-git-tag }}" >> "$GITHUB_OUTPUT"
-        echo "new-release-notes=${{ steps.release.outputs.new-release-notes || steps.get-next-version.outputs.new-release-notes }}" >> "$GITHUB_OUTPUT"
+        echo "NOTES=${{ steps.release.outputs.new-release-notes || steps.get-next-version.outputs.new-release-notes }}" >> "$GITHUB_ENV"
 
     - name: Create JSON file
       if: steps.normalize.outputs.new-release-published == 'true' && inputs.build-only != 'true' && inputs.manual-tag == 'true'
@@ -139,7 +139,7 @@ runs:
           "published": ${{ steps.normalize.outputs.new-release-published }},
           "version": "${{ steps.normalize.outputs.new-release-version }}",
           "gitTag": "${{ steps.normalize.outputs.new-release-git-tag }}",
-          "notes": "${{ steps.normalize.outputs.new-release-notes }}"
+          "notes": "$NOTES"
         }' > release.json
 
     - name: Configure git
@@ -160,8 +160,8 @@ runs:
       run: |
         git tag -a ${{ steps.normalize.outputs.new-release-git-tag }} ${{ github.sha }} -m "$NOTES"
         git push origin ${{ steps.normalize.outputs.new-release-git-tag }}
-      env:
-        NOTES: ${{ steps.normalize.outputs.new-release-notes }}
+      # env:
+      #   NOTES: ${{ steps.normalize.outputs.new-release-notes }}
 
     - name: Encode release notes
       if: steps.release.outputs.new-release-published == 'true' && inputs.build-only != 'true' && inputs.manual-tag != 'true'
@@ -175,8 +175,8 @@ runs:
       # quotes — that would break if interpolated directly into the run
       # command via ${{ }}. Passing it through an environment variable
       # lets the shell handle it safely as a raw string.
-      env:
-        NOTES: ${{ steps.release.outputs.new-release-notes }}
+      # env:
+      #   NOTES: ${{ steps.release.outputs.new-release-notes }}
 
 branding:
   icon: tag
