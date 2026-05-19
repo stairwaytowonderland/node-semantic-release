@@ -130,6 +130,15 @@ runs:
         echo "new-release-version=${{ steps.release.outputs.new-release-version || steps.get-next-version.outputs.new-release-version }}" >> "$GITHUB_OUTPUT"
         echo "new-release-git-tag=${{ steps.release.outputs.new-release-git-tag || steps.get-next-version.outputs.new-release-git-tag }}" >> "$GITHUB_OUTPUT"
 
+    - name: Configure git
+      if: inputs.build-only != 'true' && inputs.manual-tag == 'true'
+      shell: bash
+      run: |
+        # git config --global user.name "${{ github.actor }}"
+        # git config --global user.email "${{ github.actor }}@users.noreply.github.com"
+        git config --global user.name "github-actions[bot]"
+        git config --global user.email "41898282+github-actions[bot]@users.noreply.github.com"
+
     - name: Create tag
       if: inputs.build-only != 'true' && steps.normalize.outputs.new-release-git-tag != '' && inputs.manual-tag == 'true'
       shell: bash
