@@ -15,15 +15,12 @@ inputs:
   build-only:
     description: Run the build step but skip the release step (for testing).
     required: false
-    default: 'false'
   manual-tag:
     description: Manually create the release tag instead of letting semantic-release do it.
     required: false
-    default: 'false'
   typecheck:
     description: Run typechecking but skip the release step (for testing).
     required: false
-    default: 'false'
 
 outputs:
   new-release-published:
@@ -143,7 +140,7 @@ runs:
         echo "new-release-git-tag=${{ steps.release.outputs.new-release-git-tag || steps.get-next-version.outputs.new-release-git-tag }}" >> "$GITHUB_OUTPUT"
 
     - name: Create tag
-      if: inputs.build-only != 'true' && inputs.manual-tag != 'true' && steps.release.outputs.new-release-git-tag != ''
+      if: inputs.build-only != 'true' && steps.release.outputs.new-release-git-tag != '' && inputs.manual-tag == 'true'
       shell: bash
       run: git tag -a ${{ steps.release.outputs.new-release-git-tag }} ${{ github.sha }} -m "$NOTES"
       env:
