@@ -11,5 +11,5 @@ jobs:
   release:
     name: Release
     uses: ./.github/workflows/release.yaml
-    secrets:
-      github-token: ${{ secrets.GH_PAT_CREATE_RELEASE }}
+    # secrets:
+    #   github-token: ${{ secrets.GH_PAT_CREATE_RELEASE }}
