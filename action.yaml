@@ -51,17 +51,6 @@ runs:
         repository: ${{ github.action_repository }}
         path: ./.node-semantic-release
 
-    - name: Checkout target repository
-      uses: actions/checkout@v6
-      with:
-        fetch-depth: 0
-        token: ${{ env.TOKEN }}
-
-    - name: Force branch to workflow SHA
-      shell: bash
-      # Guards against commits landing while this run was queued.
-      run: git reset --hard ${{ github.sha }}
-
     - name: Setup Node.js
       uses: actions/setup-node@v6
       with:

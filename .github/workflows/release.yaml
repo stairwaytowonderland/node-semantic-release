@@ -23,6 +23,11 @@ jobs:
           fetch-depth: 0
           token: ${{ github.token }}
 
+      - name: Force branch to workflow SHA
+        shell: bash
+        # Guards against commits landing while this run was queued.
+        run: git reset --hard ${{ github.sha }}
+
       - name: Semantic release
         id: release
         uses: ./
