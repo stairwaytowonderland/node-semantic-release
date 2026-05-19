@@ -116,8 +116,8 @@ runs:
       id: release
       shell: bash
       run: npx semantic-release
-      env:
-        GITHUB_TOKEN: ${{ inputs.github-token }}
+      # env:
+      #   GITHUB_TOKEN: ${{ inputs.github-token }}
 
     - name: Encode release notes
       if: steps.release.outputs.new-release-published == 'true' && inputs.build-only != 'true'
