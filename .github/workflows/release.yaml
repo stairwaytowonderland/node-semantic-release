@@ -10,7 +10,7 @@ on:
         description: 'The workflow file to dispatch after a successful release.'
         type: string
         required: false
-        default: 'publish.yaml'
+        default: ''
     secrets:
       github-token:
         description: 'GitHub Personal Access Token with repo scope for creating releases.'
