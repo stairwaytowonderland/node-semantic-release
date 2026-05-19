@@ -69,14 +69,6 @@
 			}
 		],
 		[
-			"@semantic-release/github",
-			{
-				"assets": [
-					"${nextRelease.notesFile}"
-				]
-			}
-		],
-		[
 			"@semantic-release/git",
 			{
 				"assets": [
