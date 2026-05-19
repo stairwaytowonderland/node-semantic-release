@@ -48,19 +48,11 @@ jobs:
       new-release-notes-base64: ${{ steps.release.outputs.new-release-notes-base64 }}
 
     steps:
-      - name: Setup | Set TOKEN env var
-        run: |
-          if [ -n "${{ secrets.github-token }}" ]; then
-            echo "TOKEN=${{ secrets.github-token }}" >> $GITHUB_ENV
-          else
-            echo "TOKEN=${{ secrets.GITHUB_TOKEN }}" >> $GITHUB_ENV
-          fi
-
       - name: Checkout
         uses: actions/checkout@v6
         with:
           fetch-depth: 0
-          token: ${{ env.TOKEN }}
+          token: ${{ secrets.github-token || secrets.GITHUB_TOKEN }}
           persist-credentials: false
 
       - name: Force branch to workflow SHA
@@ -72,7 +64,7 @@ jobs:
         id: release
         uses: ./
         with:
-          github-token: ${{ env.TOKEN }}
+          github-token: ${{ secrets.github-token || secrets.GITHUB_TOKEN }}
           manual-tag: ${{ inputs.manual-tag }}
 
       - name: Release failed
