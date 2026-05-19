@@ -26,9 +26,6 @@ on:
         description: 'GitHub Personal Access Token with repo scope for creating releases.'
         required: false
 
-env:
-  TOKEN: ${{ secrets.github-token }}
-
 jobs:
   release:
     name: Semantic release

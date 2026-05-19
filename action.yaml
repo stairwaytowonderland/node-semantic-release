@@ -129,6 +129,7 @@ runs:
         echo "new-release-published=${{ steps.release.outputs.new-release-published || steps.get-next-version.outputs.new-release-published }}" >> "$GITHUB_OUTPUT"
         echo "new-release-version=${{ steps.release.outputs.new-release-version || steps.get-next-version.outputs.new-release-version }}" >> "$GITHUB_OUTPUT"
         echo "new-release-git-tag=${{ steps.release.outputs.new-release-git-tag || steps.get-next-version.outputs.new-release-git-tag }}" >> "$GITHUB_OUTPUT"
+        echo "new-release-notes=${{ steps.release.outputs.new-release-notes || steps.get-next-version.outputs.new-release-notes }}" >> "$GITHUB_OUTPUT"
 
     - name: Configure git
       if: inputs.build-only != 'true' && inputs.manual-tag == 'true'
@@ -149,7 +150,7 @@ runs:
         git tag -a ${{ steps.normalize.outputs.new-release-git-tag }} ${{ github.sha }} -m "$NOTES"
         git push origin ${{ steps.normalize.outputs.new-release-git-tag }}
       env:
-        NOTES: ${{ steps.release.outputs.new-release-notes }}
+        NOTES: ${{ steps.normalize.outputs.new-release-notes }}
 
     - name: Encode release notes
       if: steps.release.outputs.new-release-published == 'true' && inputs.build-only != 'true' && inputs.manual-tag != 'true'
