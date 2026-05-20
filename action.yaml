@@ -161,8 +161,8 @@ runs:
       if: steps.normalize.outputs.new-release-git-tag != '' && inputs.build-only != 'true' && inputs.manual-tag == 'true'
       shell: bash
       run: |
-        NOTES=$(printf '%b' "$NOTES_B64" | base64 -d)
-        git tag -a ${{ steps.normalize.outputs.new-release-git-tag }} ${{ github.sha }} -m "foobar"
+        NOTES=$(printf '%s' "$NOTES_B64" | base64 -d)
+        git tag -a ${{ steps.normalize.outputs.new-release-git-tag }} ${{ github.sha }} -m "$NOTES"
         git push origin ${{ steps.normalize.outputs.new-release-git-tag }}
       env:
         NOTES_B64: ${{ steps.encode.outputs.notes_b64 }}
