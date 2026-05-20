@@ -62,17 +62,16 @@
 				"changelogFile": "CHANGELOG.md"
 			}
 		],
-		"@semantic-release/git",
-		[
-			"@semantic-release/exec",
-			{
-				"prepareCmd": "git add CHANGELOG.md && git commit -m 'chore(release): ${nextRelease.version} [skip ci]' && git push origin HEAD:${branch.name}"
-			}
-		],
 		[
 			"@semantic-release/npm",
 			{
 				"npmPublish": false
+			}
+		],
+		[
+			"@semantic-release/exec",
+			{
+				"prepareCmd": "git add CHANGELOG.md package.json package-lock.json && git commit -m 'chore(release): ${nextRelease.version} [skip ci]' && git push origin HEAD:${branch.name}"
 			}
 		]
 	]
