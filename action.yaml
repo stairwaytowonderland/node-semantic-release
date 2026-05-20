@@ -161,11 +161,12 @@ runs:
       if: steps.normalize.outputs.new-release-git-tag != '' && inputs.build-only != 'true' && inputs.manual-tag == 'true'
       shell: bash
       run: |
-        # Build the tag message: header + blank line + decoded release notes
+        # Build the tag message: header + blank line + decoded release notes + final newline
         {
           printf 'chore(release): %s [skip ci]\n' "${{ steps.normalize.outputs.new-release-version }}"
           printf '\n'
           printf '%s' "$NOTES_B64" | base64 -d
+          printf '\n'
         } > release-notes.md
 
         echo "=== Tag message content ==="
