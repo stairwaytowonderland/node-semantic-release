@@ -163,6 +163,7 @@ runs:
       run: |
         echo -e "chore(release): ${{ steps.normalize.outputs.new-release-version }} [skip ci]\n" > release-notes.md
         NOTES=$(printf '%s' "$NOTES_B64" | base64 -d >> release-notes.md)
+        cat release-notes.md
         git tag -a ${{ steps.normalize.outputs.new-release-git-tag }} ${{ github.sha }} -F release-notes.md
         git push origin ${{ steps.normalize.outputs.new-release-git-tag }}
       env:
