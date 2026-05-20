@@ -33,9 +33,9 @@ outputs:
   new-release-git-tag:
     description: Git tag of the new release (e.g. v1.2.3).
     value: ${{ steps.release.outputs.new-release-git-tag }}
-  # new-release-notes:
-  #   description: Release notes (Markdown) of the new release.
-  #   value: ${{ steps.release.outputs.new-release-notes }}
+  new-release-notes:
+    description: Release notes (Markdown) of the new release.
+    value: ${{ steps.release.outputs.new-release-notes }}
   new-release-notes-base64:
     description: Base64-encoded release notes.
     value: ${{ steps.encode.outputs.notes_b64 }}
