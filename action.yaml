@@ -106,7 +106,7 @@ runs:
         fi
 
     - name: Release
-      if: inputs.build-only != 'true' && inputs.manual-tag != 'true'
+      if: inputs.build-only != 'true'
       id: release
       shell: bash
       run: npx semantic-release
