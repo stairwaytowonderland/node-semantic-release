@@ -65,7 +65,7 @@ jobs:
         with:
           fetch-depth: 0
           token: ${{ secrets.github-token || secrets.GITHUB_TOKEN }}
-          ref: ${{ github.sha }}
+          # ref: ${{ github.sha }}
           # persist-credentials: false
 
       - name: Semantic release
@@ -75,7 +75,7 @@ jobs:
           github-token: ${{ secrets.github-token || secrets.GITHUB_TOKEN }}
           # manual-tag: ${{ steps.vars.outputs.manual_tag }}
           changelog-file: ${{ inputs.changelog-file }}
-          ref: ${{ github.sha }}
+          # ref: ${{ github.sha }}
 
       - name: Release failed
         if: steps.release.outputs.new-release-published != 'true' && inputs.fail-on-no-release
