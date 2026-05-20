@@ -114,10 +114,11 @@ runs:
       if: inputs.build-only != 'true'
       id: release
       shell: bash
-      run: npx semantic-release $DRY_RUN_FLAG
+      run: npx semantic-release
       env:
         GITHUB_TOKEN: ${{ inputs.github-token || github.token }}
-        DRY_RUN_FLAG: ${{ inputs.manual-tag == 'true' && '--dry-run' || '' }}
+        MANUAL_TAG: ${{ inputs.manual-tag }}
+        # DRY_RUN_FLAG: ${{ inputs.manual-tag == 'true' && '--dry-run' || '' }}
 
     - name: Encode release notes
       if: steps.release.outputs.new-release-published == 'true'

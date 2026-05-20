@@ -84,7 +84,7 @@
 			{
 				"verifyReleaseCmd": "echo \"Running verifyReleaseCmd...\" && printf \"Version: '%s'\\n\" \"${nextRelease.version}\" && printf \"Notes: %s\\n\" \"${nextRelease.notes}\"",
 				"prepareCmd": "echo \"Running prepareCmd...\"",
-				"publishCmd": "echo \"Running publishCmd...\" # git add CHANGELOG.md && git commit -m 'chore(release): ${nextRelease.version}' && git push origin HEAD:${branch.name}",
+				"publishCmd": "if [ \"$MANUAL_TAG\" = \"true\" ]; then notes_file=$(mktemp); printf '%s\\n' \"${nextRelease.notes}\" > \"$notes_file\"; git tag -f -a \"${nextRelease.gitTag}\" -F \"$notes_file\" --cleanup=verbatim; git push --force origin \"refs/tags/${nextRelease.gitTag}\"; rm -f \"$notes_file\"; else echo \"manual-tag disabled; skipping exec tag push\"; fi",
 				"successCmd": "printf \"> [!TIP]\\n\" >> \"$GITHUB_STEP_SUMMARY\"; printf \"> ### Release Information\n>\n\" >> \"$GITHUB_STEP_SUMMARY\"; printf \"> ✅ **Version**: %s\n>\n\" \"${nextRelease.version}\" >> \"$GITHUB_STEP_SUMMARY\"; printf \"> 🏷️ **Git Tag**: %s\n>\n\" \"${nextRelease.gitTag}\" >> \"$GITHUB_STEP_SUMMARY\"; printf \"> 📝 **Release Notes**:\n>\n\" >> \"$GITHUB_STEP_SUMMARY\"; printf '%s\\n' \"${nextRelease.notes}\" | sed 's/^/>   > /' >> \"$GITHUB_STEP_SUMMARY\"",
 				"failCmd": "echo \"🚨 Release failed!\""
 			}
