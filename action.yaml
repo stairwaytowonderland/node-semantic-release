@@ -109,7 +109,7 @@ runs:
       if: inputs.build-only != 'true'
       id: release
       shell: bash
-      run: npx semantic-release
+      run: npx semantic-release ${{ inputs.manual-tag == 'true' && '--dry-run' || '' }}
       env:
         GITHUB_TOKEN: ${{ inputs.github-token || github.token }}
 
