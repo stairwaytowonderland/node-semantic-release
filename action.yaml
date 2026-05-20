@@ -128,34 +128,32 @@ runs:
       env:
         NOTES: ${{ steps.release.outputs.new-release-notes || steps.get-next-version.outputs.new-release-notes }}
 
-    # - name: Configure git
-    #   if: steps.release.outputs.new-release-published == 'true' && inputs.build-only != 'true' && inputs.manual-tag == 'true'
-    #   shell: bash
-    #   run: |
-    #     git config --global user.name "github-actions[bot]"
-    #     git config --global user.email "41898282+github-actions[bot]@users.noreply.github.com"
-    #     git config --global url."https://${GITHUB_TOKEN}@github.com/".insteadOf "https://github.com/"
-    #     # git config --global user.name "${{ github.actor }}"
-    #     # git config --global user.email "${{ github.actor }}@users.noreply.github.com"
-    #   env:
-    #     GITHUB_TOKEN: ${{ inputs.github-token || github.token }}
+    - name: Configure git
+      if: steps.release.outputs.new-release-published == 'true' && inputs.build-only != 'true' && inputs.manual-tag == 'true'
+      shell: bash
+      run: |
+        git config --global user.name "github-actions[bot]"
+        git config --global user.email "41898282+github-actions[bot]@users.noreply.github.com"
+        git config --global url."https://${GITHUB_TOKEN}@github.com/".insteadOf "https://github.com/"
+        # git config --global user.name "${{ github.actor }}"
+        # git config --global user.email "${{ github.actor }}@users.noreply.github.com"
+      env:
+        GITHUB_TOKEN: ${{ inputs.github-token || github.token }}
 
-    # - name: Create tag
-    #   if: steps.release.outputs.new-release-git-tag != '' && inputs.build-only != 'true' && inputs.manual-tag == 'true'
-    #   shell: bash
-    #   run: |
-    #     # Build the tag message: header + blank line + decoded release notes + final newline
-    #     {
-    #       printf 'chore(release): %s [skip ci]\n' "${{ steps.release.outputs.new-release-version }}"
-    #       printf '\n'
-    #       printf '%s' "$NOTES_B64" | base64 -d
-    #       printf '\n'
-    #     } > release-notes.md
-    #     # semantic-release already creates the tag; force-update annotation message.
-    #     git tag -fa ${{ steps.release.outputs.new-release-git-tag }} ${{ github.sha }} -F release-notes.md --cleanup=verbatim
-    #     git push --force origin refs/tags/${{ steps.release.outputs.new-release-git-tag }}
-    #   env:
-    #     NOTES_B64: ${{ steps.encode.outputs.notes_b64 }}
+    - name: Create tag
+      if: steps.release.outputs.new-release-git-tag != '' && inputs.build-only != 'true' && inputs.manual-tag == 'true'
+      shell: bash
+      run: |
+        # Build the tag message: header + blank line + decoded release notes + final newline
+        {
+          printf '%s' "$NOTES_B64" | base64 -d
+          printf '\n'
+        } > release-notes.md
+        # semantic-release already creates the tag; force-update annotation message.
+        git tag -a ${{ steps.release.outputs.new-release-git-tag }} ${{ github.sha }} -F release-notes.md --cleanup=verbatim
+        git push --force origin refs/tags/${{ steps.release.outputs.new-release-git-tag }}
+      env:
+        NOTES_B64: ${{ steps.encode.outputs.notes_b64 }}
 
 branding:
   icon: tag
