@@ -71,7 +71,7 @@
 		[
 			"@semantic-release/exec",
 			{
-				"prepareCmd": "git add CHANGELOG.md package.json package-lock.json && git commit -m 'chore(release): ${nextRelease.version} [skip ci]' && git push origin HEAD:${branch.name}"
+				"prepareCmd": "git add CHANGELOG.md package.json package-lock.json && git commit -m 'chore(release): ${nextRelease.version}' && git push origin HEAD:${branch.name}"
 			}
 		]
 	]
