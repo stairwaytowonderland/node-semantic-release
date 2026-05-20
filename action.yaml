@@ -126,7 +126,7 @@ runs:
       # command via ${{ }}. Passing it through an environment variable
       # lets the shell handle it safely as a raw string.
       env:
-        NOTES: ${{ steps.release.outputs.new-release-notes || steps.get-next-version.outputs.new-release-notes }}
+        NOTES: ${{ steps.release.outputs.new-release-notes }}
 
     - name: Configure git
       if: steps.release.outputs.new-release-published == 'true' && inputs.build-only != 'true' && inputs.manual-tag == 'true'
@@ -140,18 +140,49 @@ runs:
       env:
         GITHUB_TOKEN: ${{ inputs.github-token || github.token }}
 
+    - name: Commit CHANGELOG
+      if: steps.release.outputs.new-release-published == 'true' && inputs.build-only != 'true' && inputs.manual-tag == 'true'
+      id: changelog_commit
+      shell: bash
+      run: |
+        notes_file=$(mktemp)
+        printf '%s' "$NOTES_B64" | base64 -d > "$notes_file"
+
+        if [ -f CHANGELOG.md ]; then
+          cp CHANGELOG.md CHANGELOG.md.bak
+          {
+            cat "$notes_file"
+            printf '\n\n'
+            cat CHANGELOG.md.bak
+          } > CHANGELOG.md
+          rm -f CHANGELOG.md.bak
+        else
+          cat "$notes_file" > CHANGELOG.md
+        fi
+
+        rm -f "$notes_file"
+
+        git add CHANGELOG.md
+        if git diff --cached --quiet; then
+          echo "No CHANGELOG.md changes to commit."
+        else
+          git commit -m "chore(release): ${{ steps.release.outputs.new-release-version }} [skip ci]"
+          git push origin "HEAD:${GITHUB_REF_NAME}"
+        fi
+        echo "commit_sha=$(git rev-parse HEAD)" >> "$GITHUB_OUTPUT"
+      env:
+        NOTES_B64: ${{ steps.encode.outputs.notes_b64 }}
+
     - name: Create tag
       if: steps.release.outputs.new-release-git-tag != '' && inputs.build-only != 'true' && inputs.manual-tag == 'true'
       shell: bash
       run: |
-        # Build the tag message: header + blank line + decoded release notes + final newline
         {
           printf '%s' "$NOTES_B64" | base64 -d
           printf '\n'
         } > release-notes.md
-        # semantic-release already creates the tag; force-update annotation message.
-        git tag -a ${{ steps.release.outputs.new-release-git-tag }} ${{ github.sha }} -F release-notes.md --cleanup=verbatim
-        git push --force origin refs/tags/${{ steps.release.outputs.new-release-git-tag }}
+        git tag -a ${{ steps.release.outputs.new-release-git-tag }} ${{ steps.changelog_commit.outputs.commit_sha }} -F release-notes.md --cleanup=verbatim
+        git push origin refs/tags/${{ steps.release.outputs.new-release-git-tag }}
       env:
         NOTES_B64: ${{ steps.encode.outputs.notes_b64 }}
 
