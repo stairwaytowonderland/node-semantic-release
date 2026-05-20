@@ -1,3 +1,10 @@
+## [1.48.0](https://github.com/stairwaytowonderland/node-semantic-release/compare/v1.47.0...v1.48.0) (2026-05-20)
+
+### ✨ Features
+
+* updates ([b98ef44](https://github.com/stairwaytowonderland/node-semantic-release/commit/b98ef44b47bab62adfd9f269c18e189e647d5658))
+
+
 ## [1.47.0](https://github.com/stairwaytowonderland/node-semantic-release/compare/v1.46.0...v1.47.0) (2026-05-20)
 
 ### ✨ Features
