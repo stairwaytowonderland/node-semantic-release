@@ -195,7 +195,7 @@ runs:
         echo "> 📝 **Release Notes**:" >> $GITHUB_STEP_SUMMARY
         echo "> " >> $GITHUB_STEP_SUMMARY
         echo "::group::📝 Release Notes"
-        echo "> " >> $GITHUB_STEP_SUMMARY
+        printf "> " >> $GITHUB_STEP_SUMMARY
         printf '%s' "$NOTES_B64" | base64 -d | tee -a $GITHUB_STEP_SUMMARY
         echo "::endgroup::"
       env:
