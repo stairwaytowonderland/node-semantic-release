@@ -82,7 +82,7 @@
 		[
 			"@semantic-release/exec",
 			{
-				"analyzeCommitsCmd": "echo \"Running analyzeCommitsCmd...\" && printf \"Version: '%s'\\n\" \"${nextRelease.version}\" && printf \"Notes: %s\\n\" \"${nextRelease.notes}\"",
+				"verifyReleaseCmd": "echo \"Running verifyReleaseCmd...\" && printf \"Version: '%s'\\n\" \"${nextRelease.version}\" && printf \"Notes: %s\\n\" \"${nextRelease.notes}\"",
 				"prepareCmd": "echo \"Running prepareCmd...\"",
 				"publishCmd": "echo \"Running publishCmd...\" # git add CHANGELOG.md && git commit -m 'chore(release): ${nextRelease.version}' && git push origin HEAD:${branch.name}",
 				"successCmd": "echo \"> [!TIP]\" >> $GITHUB_STEP_SUMMARY; echo \"> ### Release Information\" >> $GITHUB_STEP_SUMMARY; echo \"> ✅ **Version**: ${nextRelease.version}\" >> $GITHUB_STEP_SUMMARY; echo \"> 🏷️ **Git Tag**: ${nextRelease.gitTag}\" >> $GITHUB_STEP_SUMMARY; echo \"> 📝 **Release Notes**:; echo \"> \" >> $GITHUB_STEP_SUMMARY; printf \"> \n\" >> $GITHUB_STEP_SUMMARY; while IFS= read -r line; do printf '%s\n' \"$line\" | sed 's/^/> /' | tee -a $GITHUB_STEP_SUMMARY; done < <(printf '%s' \"${nextRelease.notes}\" | base64 -d)",
