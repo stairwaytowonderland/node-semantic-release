@@ -197,32 +197,32 @@ runs:
     #     SHA: ${{ steps.changelog_commit.outputs.commit_sha }}
     #     NOTES_B64: ${{ steps.encode.outputs.notes_b64 }}
 
-    - name: Show release information
-      if: steps.release.outputs.new-release-published == 'true'
-      shell: bash
-      run: |
-        if [ "$MANUAL_TAG" = "true" ]; then
-          echo "::notice::🚀 Tag created successfully!"
-        else
-          echo "::notice::🚀 Release created successfully!"
-        fi
-        echo "> [!TIP]" >> $GITHUB_STEP_SUMMARY
-        echo "> ### Release Information" >> $GITHUB_STEP_SUMMARY
-        echo "> ✅ **Released version**: ${VERSION}" >> $GITHUB_STEP_SUMMARY
-        echo "> 🏷️ **Git tag**: ${TAG}" >> $GITHUB_STEP_SUMMARY
-        echo "> 📝 **Release Notes**:" >> $GITHUB_STEP_SUMMARY
-        echo "> " >> $GITHUB_STEP_SUMMARY
-        echo "::group::📝 Release Notes"
-        printf "> \n" >> $GITHUB_STEP_SUMMARY
-        while IFS= read -r line; do
-          printf '%s\n' "$line" | sed 's/^/>\ /' | tee -a $GITHUB_STEP_SUMMARY
-        done < <(printf '%s' "$NOTES_B64" | base64 -d)
-        echo "::endgroup::"
-      env:
-        TAG: ${{ steps.release.outputs.new-release-git-tag }}
-        VERSION: ${{ steps.release.outputs.new-release-version }}
-        NOTES_B64: ${{ steps.encode.outputs.notes_b64 }}
-        MANUAL_TAG: ${{ inputs.manual-tag }}
+    # - name: Show release information
+    #   if: steps.release.outputs.new-release-published == 'true'
+    #   shell: bash
+    #   run: |
+    #     if [ "$MANUAL_TAG" = "true" ]; then
+    #       echo "::notice::🚀 Tag created successfully!"
+    #     else
+    #       echo "::notice::🚀 Release created successfully!"
+    #     fi
+    #     echo "> [!TIP]" >> $GITHUB_STEP_SUMMARY
+    #     echo "> ### Release Information" >> $GITHUB_STEP_SUMMARY
+    #     echo "> ✅ **Released version**: ${VERSION}" >> $GITHUB_STEP_SUMMARY
+    #     echo "> 🏷️ **Git tag**: ${TAG}" >> $GITHUB_STEP_SUMMARY
+    #     echo "> 📝 **Release Notes**:" >> $GITHUB_STEP_SUMMARY
+    #     echo "> " >> $GITHUB_STEP_SUMMARY
+    #     echo "::group::📝 Release Notes"
+    #     printf "> \n" >> $GITHUB_STEP_SUMMARY
+    #     while IFS= read -r line; do
+    #       printf '%s\n' "$line" | sed 's/^/>\ /' | tee -a $GITHUB_STEP_SUMMARY
+    #     done < <(printf '%s' "$NOTES_B64" | base64 -d)
+    #     echo "::endgroup::"
+    #   env:
+    #     TAG: ${{ steps.release.outputs.new-release-git-tag }}
+    #     VERSION: ${{ steps.release.outputs.new-release-version }}
+    #     NOTES_B64: ${{ steps.encode.outputs.notes_b64 }}
+    #     MANUAL_TAG: ${{ inputs.manual-tag }}
 
 branding:
   icon: tag
