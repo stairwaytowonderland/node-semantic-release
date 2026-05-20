@@ -166,7 +166,7 @@ runs:
         if git diff --cached --quiet; then
           echo "No CHANGELOG.md changes to commit."
         else
-          git commit -m "chore(release): ${{ steps.release.outputs.new-release-version }} [skip ci]"
+          git commit -m "chore(release): ${{ steps.release.outputs.new-release-version }}"
           git push origin "HEAD:${GITHUB_REF_NAME}"
         fi
         echo "commit_sha=$(git rev-parse HEAD)" >> "$GITHUB_OUTPUT"
@@ -182,7 +182,7 @@ runs:
           printf '\n'
         } > release-notes.md
         git tag -a ${{ steps.release.outputs.new-release-git-tag }} ${{ steps.changelog_commit.outputs.commit_sha }} -F release-notes.md --cleanup=verbatim
-        git push origin ${{ steps.release.outputs.new-release-git-tag }}
+        git push origin refs/tags/${{ steps.release.outputs.new-release-git-tag }}
       env:
         NOTES_B64: ${{ steps.encode.outputs.notes_b64 }}
 

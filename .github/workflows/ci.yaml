@@ -3,6 +3,8 @@ name: CI
 on:
   push:
     branches: [main]
+    paths-ignore:
+      - 'CHANGELOG.md'
   workflow_dispatch:
 
 # Use PAT instead of GITHUB_TOKEN to cause semantic-release to trigger tag pipeline when tag is created.
