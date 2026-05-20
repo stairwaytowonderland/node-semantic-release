@@ -107,7 +107,7 @@ runs:
         GITHUB_TOKEN: ${{ inputs.github-token || github.token }}
 
     - name: Encode release notes
-      if: steps.release.outputs.new-release-published == 'true' && inputs.build-only != 'true'
+      if: steps.release.outputs.new-release-published == 'true'
       id: encode
       shell: bash
       # Encode the new release notes as a base64 string to safely
@@ -122,7 +122,7 @@ runs:
         NOTES: ${{ steps.release.outputs.new-release-notes }}
 
     - name: Configure git
-      if: steps.release.outputs.new-release-published == 'true' && inputs.build-only != 'true' && inputs.manual-tag == 'true'
+      if: steps.release.outputs.new-release-published == 'true' && inputs.manual-tag == 'true'
       shell: bash
       run: |
         git config --global user.name "github-actions[bot]"
@@ -134,7 +134,7 @@ runs:
         GITHUB_TOKEN: ${{ inputs.github-token || github.token }}
 
     - name: Commit CHANGELOG
-      if: steps.release.outputs.new-release-published == 'true' && inputs.build-only != 'true' && inputs.manual-tag == 'true'
+      if: steps.release.outputs.new-release-published == 'true' && inputs.manual-tag == 'true'
       id: changelog_commit
       shell: bash
       run: |
@@ -167,7 +167,7 @@ runs:
         NOTES_B64: ${{ steps.encode.outputs.notes_b64 }}
 
     - name: Create tag
-      if: steps.release.outputs.new-release-git-tag != '' && inputs.build-only != 'true' && inputs.manual-tag == 'true'
+      if: steps.release.outputs.new-release-git-tag != '' && inputs.manual-tag == 'true'
       shell: bash
       run: |
         {
@@ -178,6 +178,29 @@ runs:
         git push origin refs/tags/${{ steps.release.outputs.new-release-git-tag }}
       env:
         NOTES_B64: ${{ steps.encode.outputs.notes_b64 }}
+
+    - name: Show release information
+      if: steps.release.outputs.new-release-published == 'true'
+      shell: bash
+      run: |
+        if [ "$MANUAL_TAG" = "true" ]; then
+          echo "::notice::🚀 Tag created successfully!"
+        else
+          echo "::notice::🚀 Release created successfully!"
+        fi
+        echo "> [!TIP]" >> $GITHUB_STEP_SUMMARY
+        echo "> ### Release Information" >> $GITHUB_STEP_SUMMARY
+        echo "> ✅ **Released version**: ${{ steps.release.outputs.new-release-version }}" >> $GITHUB_STEP_SUMMARY
+        echo "> 🏷️ **Git tag**: ${{ steps.release.outputs.new-release-git-tag }}" >> $GITHUB_STEP_SUMMARY
+        echo "> 📝 **Release Notes**:" >> $GITHUB_STEP_SUMMARY
+        echo "> " >> $GITHUB_STEP_SUMMARY
+        echo "::group::📝 Release Notes"
+        printf '%s' "$NOTES_B64" | base64 -d | tee -a $GITHUB_STEP_SUMMARY
+        echo "::endgroup::"
+      env:
+        VERSION: ${{ steps.release.outputs.new-release-version }}
+        NOTES_B64: ${{ steps.encode.outputs.notes_b64 }}
+        MANUAL_TAG: ${{ inputs.manual-tag }}
 
 branding:
   icon: tag
