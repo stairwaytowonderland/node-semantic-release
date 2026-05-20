@@ -168,11 +168,6 @@ runs:
           printf '%s' "$NOTES_B64" | base64 -d
           printf '\n'
         } > release-notes.md
-
-        echo "=== Tag message content ==="
-        cat release-notes.md
-        echo "=== End tag message ==="
-
         git tag -a ${{ steps.normalize.outputs.new-release-git-tag }} ${{ github.sha }} -F release-notes.md --cleanup=verbatim
         git push origin ${{ steps.normalize.outputs.new-release-git-tag }}
       env:
