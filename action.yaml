@@ -162,6 +162,8 @@ runs:
       shell: bash
       run: |
         NOTES=$(printf '%s' "$NOTES_B64" | base64 -d)
+        echo "Notes for tag ${{ steps.normalize.outputs.new-release-git-tag }}:"
+        echo "$NOTES"
         git tag -a ${{ steps.normalize.outputs.new-release-git-tag }} ${{ github.sha }} -m "$NOTES"
         git push origin ${{ steps.normalize.outputs.new-release-git-tag }}
       env:
