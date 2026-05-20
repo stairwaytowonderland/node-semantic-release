@@ -25,6 +25,14 @@ inputs:
     description: Path to the generated changelog file to commit when using manual-tag mode.
     required: false
     default: ''
+  publish:
+    description: Dispatch the publish workflow after a successful release.
+    required: false
+    default: ''
+  ref:
+    description: The git ref to checkout for the release, or for publish.
+    required: false
+    default: ${{ github.ref }}
 
 outputs:
   new-release-published:
@@ -50,11 +58,18 @@ runs:
     - name: Checkout action repository
       uses: actions/checkout@v6
       with:
-        # fetch-depth: 0
-        ref: ${{ github.action_ref }}
-        # token: ${{ inputs.github-token }}
+        token: ${{ inputs.github-token || github.token }}
         repository: ${{ github.action_repository }}
+        ref: ${{ github.action_ref }}
         path: ./.node-semantic-release
+        persist-credentials: false
+
+    - name: Checkout target repository
+      uses: actions/checkout@v6
+      with:
+        fetch-depth: 0
+        token: ${{ inputs.github-token || github.token }}
+        ref: ${{ inputs.ref }}
 
     - name: Setup Node.js
       uses: actions/setup-node@v6
@@ -106,9 +121,10 @@ runs:
       if: inputs.build-only != 'true'
       id: release
       shell: bash
-      run: npx semantic-release ${{ inputs.manual-tag == 'true' && '--dry-run' || '' }}
+      run: npx semantic-release $DRY_RUN_FLAG
       env:
         GITHUB_TOKEN: ${{ inputs.github-token || github.token }}
+        DRY_RUN_FLAG: ${{ inputs.manual-tag == 'true' && '--dry-run' || '' }}
 
     - name: Encode release notes
       if: steps.release.outputs.new-release-published == 'true'
@@ -131,11 +147,11 @@ runs:
       run: |
         git config --global user.name "github-actions[bot]"
         git config --global user.email "41898282+github-actions[bot]@users.noreply.github.com"
-        git config --global url."https://${GITHUB_TOKEN}@github.com/".insteadOf "https://github.com/"
+        # git config --global url."https://${GITHUB_TOKEN}@github.com/".insteadOf "https://github.com/"
         # git config --global user.name "${{ github.actor }}"
         # git config --global user.email "${{ github.actor }}@users.noreply.github.com"
-      env:
-        GITHUB_TOKEN: ${{ inputs.github-token || github.token }}
+      # env:
+      #   GITHUB_TOKEN: ${{ inputs.github-token || github.token }}
 
     - name: Commit CHANGELOG
       if: steps.release.outputs.new-release-published == 'true' && inputs.manual-tag == 'true' && inputs.changelog-file != ''
@@ -163,11 +179,12 @@ runs:
         if git diff --cached --quiet; then
           echo "No ${CHANGELOG_FILE} changes to commit."
         else
-          git commit -m "chore(release): ${{ steps.release.outputs.new-release-version }}"
+          git commit -m "chore(release): ${VERSION}"
           git push origin "HEAD:${GITHUB_REF_NAME}"
         fi
         echo "commit_sha=$(git rev-parse HEAD)" >> "$GITHUB_OUTPUT"
       env:
+        VERSION: ${{ steps.release.outputs.new-release-version }}
         NOTES_B64: ${{ steps.encode.outputs.notes_b64 }}
         CHANGELOG_FILE: ${{ inputs.changelog-file }}
 
@@ -179,10 +196,12 @@ runs:
           printf '%s' "$NOTES_B64" | base64 -d
           printf '\n'
         } > release-notes.md
-        git tag -a ${{ steps.release.outputs.new-release-git-tag }} ${{ steps.changelog_commit.outputs.commit_sha }} -F release-notes.md --cleanup=verbatim
-        git push origin refs/tags/${{ steps.release.outputs.new-release-git-tag }}
+        git tag -a "$TAG" "$SHA" -F release-notes.md --cleanup=verbatim
+        git push origin refs/tags/$TAG
         rm -f release-notes.md
       env:
+        TAG: ${{ steps.release.outputs.new-release-git-tag }}
+        SHA: ${{ steps.changelog_commit.outputs.commit_sha }}
         NOTES_B64: ${{ steps.encode.outputs.notes_b64 }}
 
     - name: Show release information
