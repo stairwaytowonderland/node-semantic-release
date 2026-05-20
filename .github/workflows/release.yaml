@@ -41,7 +41,7 @@ jobs:
       new-release-published: ${{ steps.release.outputs.new-release-published }}
       new-release-version: ${{ steps.release.outputs.new-release-version }}
       new-release-git-tag: ${{ steps.release.outputs.new-release-git-tag }}
-      new-release-notes: ${{ steps.release.outputs.new-release-notes }}
+      # new-release-notes: ${{ steps.release.outputs.new-release-notes }}
       new-release-notes-base64: ${{ steps.release.outputs.new-release-notes-base64 }}
 
     steps:

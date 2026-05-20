@@ -26,16 +26,16 @@ outputs:
   new-release-published:
     description: |
       'true' if a new release was published.
-    value: ${{ steps.normalize.outputs.new-release-published }}
+    value: ${{ steps.release.outputs.new-release-published }}
   new-release-version:
     description: Version number of the new release (e.g. 1.2.3).
-    value: ${{ steps.normalize.outputs.new-release-version }}
+    value: ${{ steps.release.outputs.new-release-version }}
   new-release-git-tag:
     description: Git tag of the new release (e.g. v1.2.3).
-    value: ${{ steps.normalize.outputs.new-release-git-tag }}
+    value: ${{ steps.release.outputs.new-release-git-tag }}
   # new-release-notes:
   #   description: Release notes (Markdown) of the new release.
-  #   value: ${{ steps.normalize.outputs.new-release-notes }}
+  #   value: ${{ steps.release.outputs.new-release-notes }}
   new-release-notes-base64:
     description: Base64-encoded release notes.
     value: ${{ steps.encode.outputs.notes_b64 }}
@@ -105,14 +105,6 @@ runs:
           cp ./.node-semantic-release/templates/releaserc.json ./.releaserc
         fi
 
-    - name: Get next version
-      if: inputs.build-only != 'true' && inputs.manual-tag == 'true'
-      id: get-next-version
-      shell: bash
-      run: npx semantic-release --dry-run
-      env:
-        GITHUB_TOKEN: ${{ inputs.github-token || github.token }}
-
     - name: Release
       if: inputs.build-only != 'true' && inputs.manual-tag != 'true'
       id: release
@@ -121,23 +113,14 @@ runs:
       env:
         GITHUB_TOKEN: ${{ inputs.github-token || github.token }}
 
-    - name: Normalize outputs
-      if: inputs.build-only != 'true'
-      id: normalize
-      shell: bash
-      run: |
-        echo "new-release-published=${{ steps.release.outputs.new-release-published || steps.get-next-version.outputs.new-release-published }}" >> "$GITHUB_OUTPUT"
-        echo "new-release-version=${{ steps.release.outputs.new-release-version || steps.get-next-version.outputs.new-release-version }}" >> "$GITHUB_OUTPUT"
-        echo "new-release-git-tag=${{ steps.release.outputs.new-release-git-tag || steps.get-next-version.outputs.new-release-git-tag }}" >> "$GITHUB_OUTPUT"
-
     - name: Encode release notes
-      if: steps.normalize.outputs.new-release-published == 'true' && inputs.build-only != 'true'
+      if: steps.release.outputs.new-release-published == 'true' && inputs.build-only != 'true'
       id: encode
       shell: bash
       # Encode the new release notes as a base64 string to safely
       # pass through the workflow dispatch fields.
       run: printf '%s' "$NOTES" | base64 -w 0 | xargs -I{} echo "notes_b64={}" >> "$GITHUB_OUTPUT"
-      # The release notes from steps.normalize.outputs.new-release-notes
+      # The release notes from steps.release.outputs.new-release-notes
       # can contain arbitrary Markdown — newlines, special characters,
       # quotes — that would break if interpolated directly into the run
       # command via ${{ }}. Passing it through an environment variable
@@ -146,7 +129,7 @@ runs:
         NOTES: ${{ steps.release.outputs.new-release-notes || steps.get-next-version.outputs.new-release-notes }}
 
     - name: Configure git
-      if: steps.normalize.outputs.new-release-published == 'true' && inputs.build-only != 'true' && inputs.manual-tag == 'true'
+      if: steps.release.outputs.new-release-published == 'true' && inputs.build-only != 'true' && inputs.manual-tag == 'true'
       shell: bash
       run: |
         git config --global user.name "github-actions[bot]"
@@ -158,18 +141,19 @@ runs:
         GITHUB_TOKEN: ${{ inputs.github-token || github.token }}
 
     - name: Create tag
-      if: steps.normalize.outputs.new-release-git-tag != '' && inputs.build-only != 'true' && inputs.manual-tag == 'true'
+      if: steps.release.outputs.new-release-git-tag != '' && inputs.build-only != 'true' && inputs.manual-tag == 'true'
       shell: bash
       run: |
         # Build the tag message: header + blank line + decoded release notes + final newline
         {
-          printf 'chore(release): %s [skip ci]\n' "${{ steps.normalize.outputs.new-release-version }}"
+          printf 'chore(release): %s [skip ci]\n' "${{ steps.release.outputs.new-release-version }}"
           printf '\n'
           printf '%s' "$NOTES_B64" | base64 -d
           printf '\n'
         } > release-notes.md
-        git tag -a ${{ steps.normalize.outputs.new-release-git-tag }} ${{ github.sha }} -F release-notes.md --cleanup=verbatim
-        git push origin ${{ steps.normalize.outputs.new-release-git-tag }}
+        # semantic-release already creates the tag; force-update annotation message.
+        git tag -fa ${{ steps.release.outputs.new-release-git-tag }} ${{ github.sha }} -F release-notes.md --cleanup=verbatim
+        git push --force origin refs/tags/${{ steps.release.outputs.new-release-git-tag }}
       env:
         NOTES_B64: ${{ steps.encode.outputs.notes_b64 }}
 
