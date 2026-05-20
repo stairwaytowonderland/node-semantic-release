@@ -11,11 +11,6 @@ on:
         type: string
         required: false
         default: ''
-      manual-tag:
-        description: 'Manually create the release tag instead of letting semantic-release do it.'
-        type: boolean
-        required: false
-        default: false
       fail-on-no-release:
         description: 'Fail the workflow if no release is published (e.g. if there are no relevant commits).'
         type: boolean
@@ -49,6 +44,17 @@ jobs:
       new-release-notes-base64: ${{ steps.release.outputs.new-release-notes-base64 }}
 
     steps:
+      - name: Set manual_tag
+        id: vars
+        run: |
+          if [ -n "$DISPATCH_WORKFLOW" ]; then
+            echo "manual_tag=false" >> "$GITHUB_OUTPUT"
+          else
+            echo "manual_tag=true" >> "$GITHUB_OUTPUT"
+          fi
+        env:
+          DISPATCH_WORKFLOW: ${{ inputs.dispatch-workflow }}
+
       - name: Checkout
         uses: actions/checkout@v6
         with:
@@ -62,7 +68,7 @@ jobs:
         uses: ./
         with:
           github-token: ${{ secrets.github-token || secrets.GITHUB_TOKEN }}
-          manual-tag: ${{ inputs.manual-tag }}
+          manual-tag: ${{ steps.vars.outputs.manual_tag }}
 
       - name: Release failed
         if: steps.release.outputs.new-release-published != 'true' && inputs.fail-on-no-release
