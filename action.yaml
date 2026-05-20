@@ -173,7 +173,7 @@ runs:
         cat release-notes.md
         echo "=== End tag message ==="
 
-        git tag -a ${{ steps.normalize.outputs.new-release-git-tag }} ${{ github.sha }} -F release-notes.md
+        git tag -a ${{ steps.normalize.outputs.new-release-git-tag }} ${{ github.sha }} -F release-notes.md --cleanup=verbatim
         git push origin ${{ steps.normalize.outputs.new-release-git-tag }}
       env:
         NOTES_B64: ${{ steps.encode.outputs.notes_b64 }}
