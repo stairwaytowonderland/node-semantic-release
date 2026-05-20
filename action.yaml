@@ -181,21 +181,21 @@ runs:
     #     NOTES_B64: ${{ steps.encode.outputs.notes_b64 }}
     #     CHANGELOG_FILE: ${{ inputs.changelog-file }}
 
-    - name: Create tag
-      if: steps.release.outputs.new-release-git-tag != '' && inputs.manual-tag == 'true'
-      shell: bash
-      run: |
-        {
-          printf '%s' "$NOTES_B64" | base64 -d
-          printf '\n'
-        } > release-notes.md
-        git tag -a "$TAG" "$SHA" -F release-notes.md --cleanup=verbatim
-        git push origin refs/tags/$TAG
-        rm -f release-notes.md
-      env:
-        TAG: ${{ steps.release.outputs.new-release-git-tag }}
-        SHA: ${{ steps.changelog_commit.outputs.commit_sha }}
-        NOTES_B64: ${{ steps.encode.outputs.notes_b64 }}
+    # - name: Create tag
+    #   if: steps.release.outputs.new-release-git-tag != '' && inputs.manual-tag == 'true'
+    #   shell: bash
+    #   run: |
+    #     {
+    #       printf '%s' "$NOTES_B64" | base64 -d
+    #       printf '\n'
+    #     } > release-notes.md
+    #     git tag -a "$TAG" "$SHA" -F release-notes.md --cleanup=verbatim
+    #     git push origin refs/tags/$TAG
+    #     rm -f release-notes.md
+    #   env:
+    #     TAG: ${{ steps.release.outputs.new-release-git-tag }}
+    #     SHA: ${{ steps.changelog_commit.outputs.commit_sha }}
+    #     NOTES_B64: ${{ steps.encode.outputs.notes_b64 }}
 
     - name: Show release information
       if: steps.release.outputs.new-release-published == 'true'
