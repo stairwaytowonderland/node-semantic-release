@@ -213,7 +213,7 @@ runs:
         echo "> 📝 **Release Notes**:" >> $GITHUB_STEP_SUMMARY
         echo "> " >> $GITHUB_STEP_SUMMARY
         echo "::group::📝 Release Notes"
-        printf "> " >> $GITHUB_STEP_SUMMARY
+        printf "> \n" >> $GITHUB_STEP_SUMMARY
         while IFS= read -r line; do
           printf '%s\n' "$line" | sed 's/^/>\ /' | tee -a $GITHUB_STEP_SUMMARY
         done < <(printf '%s' "$NOTES_B64" | base64 -d)

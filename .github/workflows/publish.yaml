@@ -45,6 +45,34 @@ jobs:
         env:
           NOTES_B64: ${{ inputs.notes-b64 }}
 
+      # - name: Create or update release
+      #   run: |
+      #     tag="${{ steps.vars.outputs.tag }}"
+
+      #     if gh release view "$tag" >/dev/null 2>&1; then
+      #       echo "Release for $tag already exists."
+      #       if [ -f release-notes.md ]; then
+      #         gh release edit "$tag" \
+      #           --title "$tag" \
+      #           --notes-file release-notes.md
+      #         echo "Updated existing release notes for $tag."
+      #       else
+      #         echo "No provided notes. Leaving existing release unchanged for $tag."
+      #       fi
+      #     else
+      #       if [ -f release-notes.md ]; then
+      #         gh release create "$tag" \
+      #           --title "$tag" \
+      #           --notes-file release-notes.md
+      #       else
+      #         gh release create "$tag" \
+      #           --title "$tag" \
+      #           --notes-from-tag
+      #       fi
+      #     fi
+      #   env:
+      #     GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
       - name: Create release
         run: |
           if [ -f release-notes.md ]; then
