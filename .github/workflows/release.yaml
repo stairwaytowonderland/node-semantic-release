@@ -16,6 +16,11 @@ on:
         type: boolean
         required: false
         default: false
+      changelog-file:
+        description: 'Path to the generated changelog file to commit when using manual-tag mode.'
+        type: string
+        required: false
+        default: ''
     secrets:
       github-token:
         description: 'GitHub Personal Access Token with repo scope for creating releases.'
@@ -69,6 +74,7 @@ jobs:
         with:
           github-token: ${{ secrets.github-token || secrets.GITHUB_TOKEN }}
           manual-tag: ${{ steps.vars.outputs.manual_tag }}
+          changelog-file: ${{ inputs.changelog-file }}
 
       - name: Release failed
         if: steps.release.outputs.new-release-published != 'true' && inputs.fail-on-no-release

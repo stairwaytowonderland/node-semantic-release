@@ -21,6 +21,10 @@ inputs:
   typecheck:
     description: Run typechecking but skip the release step (for testing).
     required: false
+  changelog-file:
+    description: Path to the generated changelog file to commit when using manual-tag mode.
+    required: false
+    default: ''
 
 outputs:
   new-release-published:
@@ -134,30 +138,30 @@ runs:
         GITHUB_TOKEN: ${{ inputs.github-token || github.token }}
 
     - name: Commit CHANGELOG
-      if: steps.release.outputs.new-release-published == 'true' && inputs.manual-tag == 'true'
+      if: steps.release.outputs.new-release-published == 'true' && inputs.manual-tag == 'true' && inputs.changelog-file != ''
       id: changelog_commit
       shell: bash
       run: |
         notes_file=$(mktemp)
         printf '%s' "$NOTES_B64" | base64 -d > "$notes_file"
 
-        if [ -f CHANGELOG.md ]; then
-          cp CHANGELOG.md CHANGELOG.md.bak
+        if [ -f "$CHANGELOG_FILE" ]; then
+          cp "$CHANGELOG_FILE" "${CHANGELOG_FILE}.bak"
           {
             cat "$notes_file"
             printf '\n\n'
-            cat CHANGELOG.md.bak
-          } > CHANGELOG.md
-          rm -f CHANGELOG.md.bak
+            cat "${CHANGELOG_FILE}.bak"
+          } > "$CHANGELOG_FILE"
+          rm -f "${CHANGELOG_FILE}.bak"
         else
-          cat "$notes_file" > CHANGELOG.md
+          cat "$notes_file" > "$CHANGELOG_FILE"
         fi
 
         rm -f "$notes_file"
 
-        git add CHANGELOG.md
+        git add "$CHANGELOG_FILE"
         if git diff --cached --quiet; then
-          echo "No CHANGELOG.md changes to commit."
+          echo "No ${CHANGELOG_FILE} changes to commit."
         else
           git commit -m "chore(release): ${{ steps.release.outputs.new-release-version }}"
           git push origin "HEAD:${GITHUB_REF_NAME}"
@@ -165,6 +169,7 @@ runs:
         echo "commit_sha=$(git rev-parse HEAD)" >> "$GITHUB_OUTPUT"
       env:
         NOTES_B64: ${{ steps.encode.outputs.notes_b64 }}
+        CHANGELOG_FILE: ${{ inputs.changelog-file }}
 
     - name: Create tag
       if: steps.release.outputs.new-release-git-tag != '' && inputs.manual-tag == 'true'
@@ -176,6 +181,7 @@ runs:
         } > release-notes.md
         git tag -a ${{ steps.release.outputs.new-release-git-tag }} ${{ steps.changelog_commit.outputs.commit_sha }} -F release-notes.md --cleanup=verbatim
         git push origin refs/tags/${{ steps.release.outputs.new-release-git-tag }}
+        rm -f release-notes.md
       env:
         NOTES_B64: ${{ steps.encode.outputs.notes_b64 }}
 
