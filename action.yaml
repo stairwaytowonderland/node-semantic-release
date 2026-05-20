@@ -190,14 +190,15 @@ runs:
         fi
         echo "> [!TIP]" >> $GITHUB_STEP_SUMMARY
         echo "> ### Release Information" >> $GITHUB_STEP_SUMMARY
-        echo "> ✅ **Released version**: ${{ steps.release.outputs.new-release-version }}" >> $GITHUB_STEP_SUMMARY
-        echo "> 🏷️ **Git tag**: ${{ steps.release.outputs.new-release-git-tag }}" >> $GITHUB_STEP_SUMMARY
+        echo "> ✅ **Released version**: ${VERSION}" >> $GITHUB_STEP_SUMMARY
+        echo "> 🏷️ **Git tag**: ${TAG}" >> $GITHUB_STEP_SUMMARY
         echo "> 📝 **Release Notes**:" >> $GITHUB_STEP_SUMMARY
         echo "> " >> $GITHUB_STEP_SUMMARY
         echo "::group::📝 Release Notes"
         printf '%s' "$NOTES_B64" | base64 -d | tee -a $GITHUB_STEP_SUMMARY
         echo "::endgroup::"
       env:
+        TAG: ${{ steps.release.outputs.new-release-git-tag }}
         VERSION: ${{ steps.release.outputs.new-release-version }}
         NOTES_B64: ${{ steps.encode.outputs.notes_b64 }}
         MANUAL_TAG: ${{ inputs.manual-tag }}
