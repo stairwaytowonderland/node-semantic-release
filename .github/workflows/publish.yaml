@@ -49,12 +49,10 @@ jobs:
         run: |
           if [ -f release-notes.md ]; then
             gh release create "${{ steps.vars.outputs.tag }}" \
-              --repo "${{ github.repository }}" \
               --title "${{ steps.vars.outputs.tag }}" \
               --notes-file release-notes.md
           else
             gh release create "${{ steps.vars.outputs.tag }}" \
-              --repo "${{ github.repository }}" \
               --title "${{ steps.vars.outputs.tag }}" \
               --notes-from-tag
           fi
