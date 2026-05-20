@@ -73,7 +73,7 @@ jobs:
         uses: ./
         with:
           github-token: ${{ secrets.github-token || secrets.GITHUB_TOKEN }}
-          manual-tag: ${{ steps.vars.outputs.manual_tag }}
+          # manual-tag: ${{ steps.vars.outputs.manual_tag }}
           changelog-file: ${{ inputs.changelog-file }}
           ref: ${{ github.sha }}
 

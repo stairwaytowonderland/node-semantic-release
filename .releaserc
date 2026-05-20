@@ -57,9 +57,9 @@
 		],
 		"semantic-release-export-data",
 		[
-			"@semantic-release/changelog",
+			"@semantic-release/exec",
 			{
-				"changelogFile": "CHANGELOG.md"
+				"prepareCmd": "git add CHANGELOG.md && git commit -m 'chore(release): ${nextRelease.version}' && git push origin HEAD:${branch.name}"
 			}
 		],
 		[
@@ -68,16 +68,6 @@
 				"npmPublish": false
 			}
 		],
-		[
-			"@semantic-release/git",
-			{
-				"assets": [
-					"CHANGELOG.md",
-					"package.json",
-					"package-lock.json"
-				],
-				"message": "chore(release): ${nextRelease.version} [skip ci]\n\n${nextRelease.notes}"
-			}
-		]
+		"@semantic-release/github"
 	]
 }

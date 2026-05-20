@@ -146,40 +146,40 @@ runs:
       # env:
       #   GITHUB_TOKEN: ${{ inputs.github-token || github.token }}
 
-    - name: Commit CHANGELOG
-      if: steps.release.outputs.new-release-published == 'true' && inputs.manual-tag == 'true' && inputs.changelog-file != ''
-      id: changelog_commit
-      shell: bash
-      run: |
-        notes_file=$(mktemp)
-        printf '%s' "$NOTES_B64" | base64 -d > "$notes_file"
+    # - name: Commit CHANGELOG
+    #   if: steps.release.outputs.new-release-published == 'true' && inputs.manual-tag == 'true' && inputs.changelog-file != ''
+    #   id: changelog_commit
+    #   shell: bash
+    #   run: |
+    #     notes_file=$(mktemp)
+    #     printf '%s' "$NOTES_B64" | base64 -d > "$notes_file"
 
-        if [ -f "$CHANGELOG_FILE" ]; then
-          cp "$CHANGELOG_FILE" "${CHANGELOG_FILE}.bak"
-          {
-            cat "$notes_file"
-            printf '\n\n'
-            cat "${CHANGELOG_FILE}.bak"
-          } > "$CHANGELOG_FILE"
-          rm -f "${CHANGELOG_FILE}.bak"
-        else
-          cat "$notes_file" > "$CHANGELOG_FILE"
-        fi
+    #     if [ -f "$CHANGELOG_FILE" ]; then
+    #       cp "$CHANGELOG_FILE" "${CHANGELOG_FILE}.bak"
+    #       {
+    #         cat "$notes_file"
+    #         printf '\n\n'
+    #         cat "${CHANGELOG_FILE}.bak"
+    #       } > "$CHANGELOG_FILE"
+    #       rm -f "${CHANGELOG_FILE}.bak"
+    #     else
+    #       cat "$notes_file" > "$CHANGELOG_FILE"
+    #     fi
 
-        rm -f "$notes_file"
+    #     rm -f "$notes_file"
 
-        git add "$CHANGELOG_FILE"
-        if git diff --cached --quiet; then
-          echo "No ${CHANGELOG_FILE} changes to commit."
-        else
-          git commit -m "chore(release): ${VERSION}"
-          git push origin "HEAD:${GITHUB_REF_NAME}"
-        fi
-        echo "commit_sha=$(git rev-parse HEAD)" >> "$GITHUB_OUTPUT"
-      env:
-        VERSION: ${{ steps.release.outputs.new-release-version }}
-        NOTES_B64: ${{ steps.encode.outputs.notes_b64 }}
-        CHANGELOG_FILE: ${{ inputs.changelog-file }}
+    #     git add "$CHANGELOG_FILE"
+    #     if git diff --cached --quiet; then
+    #       echo "No ${CHANGELOG_FILE} changes to commit."
+    #     else
+    #       git commit -m "chore(release): ${VERSION}"
+    #       git push origin "HEAD:${GITHUB_REF_NAME}"
+    #     fi
+    #     echo "commit_sha=$(git rev-parse HEAD)" >> "$GITHUB_OUTPUT"
+    #   env:
+    #     VERSION: ${{ steps.release.outputs.new-release-version }}
+    #     NOTES_B64: ${{ steps.encode.outputs.notes_b64 }}
+    #     CHANGELOG_FILE: ${{ inputs.changelog-file }}
 
     - name: Create tag
       if: steps.release.outputs.new-release-git-tag != '' && inputs.manual-tag == 'true'
