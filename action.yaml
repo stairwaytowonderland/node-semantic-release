@@ -43,13 +43,6 @@ outputs:
 runs:
   using: composite
   steps:
-    # - name: Check token input
-    #   if: inputs.build-only != 'true' && inputs.github-token == ''
-    #   shell: bash
-    #   run: |
-    #     echo "::error::github-token input is required to publish a release. Provide a token with repo + write access."
-    #     exit 1
-
     - name: Checkout action repository
       uses: actions/checkout@v6
       with:
