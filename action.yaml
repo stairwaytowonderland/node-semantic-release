@@ -161,10 +161,9 @@ runs:
       if: steps.normalize.outputs.new-release-git-tag != '' && inputs.build-only != 'true' && inputs.manual-tag == 'true'
       shell: bash
       run: |
-        NOTES=$(printf '%s' "$NOTES_B64" | base64 -d)
-        echo "Notes for tag ${{ steps.normalize.outputs.new-release-git-tag }}:"
-        echo "$NOTES"
-        git tag -a ${{ steps.normalize.outputs.new-release-git-tag }} ${{ github.sha }} -m "$NOTES"
+        echo -e "chore(release): ${{ steps.normalize.outputs.new-release-version }} [skip ci]\n" > release-notes.md
+        NOTES=$(printf '%s' "$NOTES_B64" | base64 -d >> release-notes.md)
+        git tag -a ${{ steps.normalize.outputs.new-release-git-tag }} ${{ github.sha }} -F release-notes.md
         git push origin ${{ steps.normalize.outputs.new-release-git-tag }}
       env:
         NOTES_B64: ${{ steps.encode.outputs.notes_b64 }}
