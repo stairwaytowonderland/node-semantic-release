@@ -161,9 +161,8 @@ runs:
         git config --global user.email "$COMMIT_EMAIL"
         # git config --global user.name "github-actions[bot]"
         # git config --global user.email "41898282+github-actions[bot]@users.noreply.github.com"
-        # git config --global user.name "${{ github.actor }}"
-        # git config --global user.email "${{ github.actor }}@users.noreply.github.com"
-        # git config --global url."https://${GITHUB_TOKEN}@github.com/".insteadOf "https://github.com/"
+        # git config --global user.name "semantic-release-bot"
+        # git config --global user.email "semantic-release-bot@martynus.net"
       env:
         COMMIT_AUTHOR: ${{ inputs.commit-author || github.actor }}
         COMMIT_EMAIL: ${{ inputs.commit-email || format('{0}@{1}', github.actor, 'users.noreply.github.com') }}
@@ -176,11 +175,26 @@ runs:
       env:
         VERSION: ${{ steps.release.outputs.new-release-version }}
 
-    - name: Update CHANGELOG
-      if: steps.release.outputs.new-release-published == 'true' && inputs.manual-tag == 'true' && inputs.changelog-file != ''
+    - name: Decode release notes
+      if: steps.release.outputs.new-release-published == 'true'
+      id: notes
       shell: bash
       run: |
-        printf '%s' "$NOTES_B64" | base64 -d > "$NOTES_FILE"
+        {
+          printf '%s' "$NOTES_B64" | base64 -d
+          printf '\n'
+        } > "$NOTES_FILE"
+        echo "notes-file=$NOTES_FILE" >> "$GITHUB_OUTPUT"
+      env:
+        NOTES_B64: ${{ steps.encode.outputs.notes_b64 }}
+        NOTES_FILE: release-notes.md
+
+    - name: Update CHANGELOG
+      if: steps.release.outputs.new-release-published == 'true' && inputs.manual-tag == 'true' && inputs.changelog-file != ''
+      id: changelog
+      shell: bash
+      run: |
+        notes=$(cat "$NOTES_FILE" 2> /dev/null || true)
 
         if [ -f "$CHANGELOG_FILE" ]; then
           cp "$CHANGELOG_FILE" "${CHANGELOG_FILE}.bak"
@@ -194,8 +208,7 @@ runs:
           cat "$NOTES_FILE" > "$CHANGELOG_FILE"
         fi
       env:
-        NOTES_B64: ${{ steps.encode.outputs.notes_b64 }}
-        NOTES_FILE: release-notes.md
+        NOTES_FILE: ${{ steps.notes.outputs.notes-file }}
         CHANGELOG_FILE: ${{ inputs.changelog-file }}
 
     - name: Commit assets
@@ -208,7 +221,7 @@ runs:
           echo "No changes to commit."
         else
           if [ -f "$NOTES_FILE" ]; then
-            notes=$(cat "$NOTES_FILE")
+            notes=$(cat "$NOTES_FILE" 2> /dev/null || true)
             git commit -m "chore(release): ${VERSION} [skip ci]\\n\\n${notes}"
           else
             git commit -m "chore(release): ${VERSION} [skip ci]"
@@ -218,8 +231,7 @@ runs:
         fi
       env:
         VERSION: ${{ steps.release.outputs.new-release-version }}
-        # NOTES_B64: ${{ steps.encode.outputs.notes_b64 }}
-        NOTES_FILE: release-notes.md
+        NOTES_FILE: ${{ steps.notes.outputs.notes-file }}
         CHANGELOG_FILE: ${{ inputs.changelog-file }}
         ADDITIONAL_ASSETS: ${{ inputs.additional-assets }}
 
@@ -231,14 +243,13 @@ runs:
         #   printf '%s' "$NOTES_B64" | base64 -d
         #   printf '\n'
         # } > "$NOTES_FILE"
-        git tag -a "$TAG" "$SHA" -F "$NOTES_FILE" --cleanup=verbatim
+        notes=$(cat "$NOTES_FILE" 2> /dev/null || true)
+        git tag -a "$TAG" "$SHA" -F "$notes" --cleanup=verbatim
         git push origin refs/tags/$TAG
-        rm -f release-notes.md
       env:
         TAG: ${{ steps.release.outputs.new-release-git-tag }}
         SHA: ${{ steps.assets.outputs.commit_sha }}
-        # NOTES_B64: ${{ steps.encode.outputs.notes_b64 }}
-        NOTES_FILE: release-notes.md
+        NOTES_FILE: ${{ steps.notes.outputs.notes-file }}
 
     - name: Show release information
       if: steps.release.outputs.new-release-published == 'true'
@@ -249,6 +260,7 @@ runs:
         else
           echo "::notice::🚀 Release created successfully!"
         fi
+        notes=$(cat "$NOTES_FILE" 2> /dev/null || true)
         echo "> [!TIP]" >> $GITHUB_STEP_SUMMARY
         echo "> ### Release Information" >> $GITHUB_STEP_SUMMARY
         echo "> ✅ **Version**: ${VERSION}" >> $GITHUB_STEP_SUMMARY
@@ -259,14 +271,12 @@ runs:
         printf ">   > \n" >> $GITHUB_STEP_SUMMARY
         while IFS= read -r line; do
           printf '%s\n' "$line" | sed 's/^/>\ /' | tee -a $GITHUB_STEP_SUMMARY
-        done < "$NOTES_FILE"
-        # done < <(printf '%s' "$NOTES_B64" | base64 -d)
+        done < "$notes"
         echo "::endgroup::"
       env:
         TAG: ${{ steps.release.outputs.new-release-git-tag }}
         VERSION: ${{ steps.release.outputs.new-release-version }}
-        NOTES_B64: ${{ steps.encode.outputs.notes_b64 }}
-        NOTES_FILE: release-notes.md
+        NOTES_FILE: ${{ steps.notes.outputs.notes-file }}
         MANUAL_TAG: ${{ inputs.manual-tag }}
 
 branding:
