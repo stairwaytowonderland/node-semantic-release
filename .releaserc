@@ -78,13 +78,6 @@
 				],
 				"message": "chore(release): ${nextRelease.version} [skip ci]\n\n${nextRelease.notes}"
 			}
-		],
-		[
-			"@semantic-release/exec",
-			{
-				"verifyReleaseCmd": "echo \"Running verifyReleaseCmd...\" && printf \"Version: '%s'\\n\" \"${nextRelease.version}\"",
-				"generateNotesCmd": "echo \"Running generateNotesCmd...\" && printf \"Notes:\n'%s'\\n\" \"${nextRelease.notes}\""
-			}
 		]
 	]
 }
