@@ -246,7 +246,7 @@ runs:
         NOTES_FILE: ${{ steps.notes.outputs.notes-file }}
 
     - name: Show release information
-      if: steps.notes.outputs.notes-file != '' && steps.release.outputs.new-release-published == 'true'
+      if: steps.release.outputs.new-release-published == 'true'
       shell: bash
       run: |
         if [ "$MANUAL_TAG" = "true" ]; then
@@ -255,7 +255,6 @@ runs:
           echo "::notice::🚀 Release created successfully!"
         fi
         if [ -f "$NOTES_FILE" ]; then
-          notes=$(cat "$NOTES_FILE" 2> /dev/null || true)
           echo "> [!TIP]" >> $GITHUB_STEP_SUMMARY
           echo "> ### Release Information" >> $GITHUB_STEP_SUMMARY
           echo "> ✅ **Version**: ${VERSION}" >> $GITHUB_STEP_SUMMARY
@@ -266,7 +265,7 @@ runs:
           printf ">   > \n" >> $GITHUB_STEP_SUMMARY
           while IFS= read -r line; do
             printf '%s\n' "$line" | sed 's/^/>\ /' | tee -a $GITHUB_STEP_SUMMARY
-          done < "$notes"
+          done < "$NOTES_FILE"
           echo "::endgroup::"
         fi
       env:
