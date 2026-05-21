@@ -13,6 +13,7 @@ on:
 jobs:
   release:
     name: Release
+    if: ${{ !startsWith(github.event.head_commit.message, 'chore(release):') }}
     uses: ./.github/workflows/release.yaml
     with:
       # dispatch-workflow: publish.yaml
