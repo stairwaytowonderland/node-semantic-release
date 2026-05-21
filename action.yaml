@@ -135,17 +135,17 @@ runs:
       env:
         NOTES: ${{ steps.release.outputs.new-release-notes }}
 
-    - name: Configure git
-      if: steps.release.outputs.new-release-published == 'true' && inputs.manual-tag == 'true'
-      shell: bash
-      run: |
-        git config --global user.name "github-actions[bot]"
-        git config --global user.email "41898282+github-actions[bot]@users.noreply.github.com"
-        # git config --global url."https://${GITHUB_TOKEN}@github.com/".insteadOf "https://github.com/"
-        # git config --global user.name "${{ github.actor }}"
-        # git config --global user.email "${{ github.actor }}@users.noreply.github.com"
-      # env:
-      #   GITHUB_TOKEN: ${{ inputs.github-token || github.token }}
+    # - name: Configure git
+    #   if: steps.release.outputs.new-release-published == 'true' && inputs.manual-tag == 'true'
+    #   shell: bash
+    #   run: |
+    #     git config --global user.name "github-actions[bot]"
+    #     git config --global user.email "41898282+github-actions[bot]@users.noreply.github.com"
+    #     # git config --global url."https://${GITHUB_TOKEN}@github.com/".insteadOf "https://github.com/"
+    #     # git config --global user.name "${{ github.actor }}"
+    #     # git config --global user.email "${{ github.actor }}@users.noreply.github.com"
+    #   # env:
+    #   #   GITHUB_TOKEN: ${{ inputs.github-token || github.token }}
 
     # - name: Commit CHANGELOG
     #   if: steps.release.outputs.new-release-published == 'true' && inputs.manual-tag == 'true' && inputs.changelog-file != ''
