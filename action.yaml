@@ -180,24 +180,22 @@ runs:
       if: steps.release.outputs.new-release-published == 'true' && inputs.manual-tag == 'true' && inputs.changelog-file != ''
       shell: bash
       run: |
-        notes_file=$(mktemp)
-        printf '%s' "$NOTES_B64" | base64 -d > "$notes_file"
+        printf '%s' "$NOTES_B64" | base64 -d > "$NOTES_FILE"
 
         if [ -f "$CHANGELOG_FILE" ]; then
           cp "$CHANGELOG_FILE" "${CHANGELOG_FILE}.bak"
           {
-            cat "$notes_file"
+            cat "$NOTES_FILE"
             printf '\n\n'
             cat "${CHANGELOG_FILE}.bak"
           } > "$CHANGELOG_FILE"
           rm -f "${CHANGELOG_FILE}.bak"
         else
-          cat "$notes_file" > "$CHANGELOG_FILE"
+          cat "$NOTES_FILE" > "$CHANGELOG_FILE"
         fi
-
-        rm -f "$notes_file"
       env:
         NOTES_B64: ${{ steps.encode.outputs.notes_b64 }}
+        NOTES_FILE: release-notes.md
         CHANGELOG_FILE: ${{ inputs.changelog-file }}
 
     - name: Commit assets
@@ -209,12 +207,19 @@ runs:
         if git diff --cached --quiet; then
           echo "No changes to commit."
         else
-          git commit -m "chore(release): ${VERSION}"
+          if [ -f "$NOTES_FILE" ]; then
+            notes=$(cat "$NOTES_FILE")
+            git commit -m "chore(release): ${VERSION}\n\n${notes}"
+          else
+            git commit -m "chore(release): ${VERSION}"
+          fi
           git push origin "HEAD:${GITHUB_REF_NAME}"
           echo "commit_sha=$(git rev-parse HEAD)" >> "$GITHUB_OUTPUT"
         fi
       env:
         VERSION: ${{ steps.release.outputs.new-release-version }}
+        # NOTES_B64: ${{ steps.encode.outputs.notes_b64 }}
+        NOTES_FILE: release-notes.md
         CHANGELOG_FILE: ${{ inputs.changelog-file }}
         ADDITIONAL_ASSETS: ${{ inputs.additional-assets }}
 
@@ -222,17 +227,18 @@ runs:
       if: steps.assets.outputs.commit_sha != ''
       shell: bash
       run: |
-        {
-          printf '%s' "$NOTES_B64" | base64 -d
-          printf '\n'
-        } > release-notes.md
-        git tag -a "$TAG" "$SHA" -F release-notes.md --cleanup=verbatim
+        # {
+        #   printf '%s' "$NOTES_B64" | base64 -d
+        #   printf '\n'
+        # } > "$NOTES_FILE"
+        git tag -a "$TAG" "$SHA" -F "$NOTES_FILE" --cleanup=verbatim
         git push origin refs/tags/$TAG
         rm -f release-notes.md
       env:
         TAG: ${{ steps.release.outputs.new-release-git-tag }}
         SHA: ${{ steps.assets.outputs.commit_sha }}
-        NOTES_B64: ${{ steps.encode.outputs.notes_b64 }}
+        # NOTES_B64: ${{ steps.encode.outputs.notes_b64 }}
+        NOTES_FILE: release-notes.md
 
     - name: Show release information
       if: steps.release.outputs.new-release-published == 'true'
