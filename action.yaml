@@ -157,6 +157,7 @@ runs:
       if: steps.release.outputs.new-release-published == 'true' && inputs.manual-tag == 'true'
       shell: bash
       run: |
+        git config --global commit.cleanup verbatim
         git config --global user.name "$COMMIT_AUTHOR"
         git config --global user.email "$COMMIT_EMAIL"
         # git config --global user.name "github-actions[bot]"
@@ -168,12 +169,12 @@ runs:
         COMMIT_EMAIL: ${{ inputs.commit-email || format('{0}@{1}', github.actor, 'users.noreply.github.com') }}
       #   GITHUB_TOKEN: ${{ inputs.github-token || github.token }}
 
-    - name: Update version
-      if: steps.release.outputs.new-release-published == 'true' && inputs.manual-tag == 'true'
-      shell: bash
-      run: npm version ${VERSION} --no-git-tag-version
-      env:
-        VERSION: ${{ steps.release.outputs.new-release-version }}
+    # - name: Update version
+    #   if: steps.release.outputs.new-release-published == 'true' && inputs.manual-tag == 'true'
+    #   shell: bash
+    #   run: npm version ${VERSION} --no-git-tag-version
+    #   env:
+    #     VERSION: ${{ steps.release.outputs.new-release-version }}
 
     - name: Decode release notes
       if: steps.release.outputs.new-release-published == 'true'
@@ -239,7 +240,7 @@ runs:
       if: steps.assets.outputs.commit_sha != ''
       shell: bash
       run: |
-        git tag -a "$TAG" "$SHA" -F "$NOTES_FILE" --cleanup=verbatim
+        git tag -a "$TAG" "$SHA" -F "$NOTES_FILE"
         git push origin refs/tags/$TAG
       env:
         TAG: ${{ steps.release.outputs.new-release-git-tag }}
