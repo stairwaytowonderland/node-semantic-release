@@ -169,12 +169,12 @@ runs:
         COMMIT_EMAIL: ${{ inputs.commit-email || format('{0}@{1}', github.actor, 'users.noreply.github.com') }}
       #   GITHUB_TOKEN: ${{ inputs.github-token || github.token }}
 
-    # - name: Update version
-    #   if: steps.release.outputs.new-release-published == 'true' && inputs.manual-tag == 'true'
-    #   shell: bash
-    #   run: npm version ${VERSION} --no-git-tag-version
-    #   env:
-    #     VERSION: ${{ steps.release.outputs.new-release-version }}
+    - name: Update version
+      if: steps.release.outputs.new-release-published == 'true' && inputs.manual-tag == 'true'
+      shell: bash
+      run: npm version ${VERSION} --no-git-tag-version
+      env:
+        VERSION: ${{ steps.release.outputs.new-release-version }}
 
     - name: Decode release notes
       if: steps.release.outputs.new-release-published == 'true'
@@ -195,8 +195,6 @@ runs:
       id: changelog
       shell: bash
       run: |
-        notes=$(cat "$NOTES_FILE" 2> /dev/null || true)
-
         if [ -f "$CHANGELOG_FILE" ]; then
           cp "$CHANGELOG_FILE" "${CHANGELOG_FILE}.bak"
           {
@@ -248,7 +246,7 @@ runs:
         NOTES_FILE: ${{ steps.notes.outputs.notes-file }}
 
     - name: Show release information
-      if: steps.release.outputs.new-release-published == 'true'
+      if: steps.notes.outputs.notes-file != '' && steps.release.outputs.new-release-published == 'true'
       shell: bash
       run: |
         if [ "$MANUAL_TAG" = "true" ]; then
@@ -256,19 +254,21 @@ runs:
         else
           echo "::notice::🚀 Release created successfully!"
         fi
-        notes=$(cat "$NOTES_FILE" 2> /dev/null || true)
-        echo "> [!TIP]" >> $GITHUB_STEP_SUMMARY
-        echo "> ### Release Information" >> $GITHUB_STEP_SUMMARY
-        echo "> ✅ **Version**: ${VERSION}" >> $GITHUB_STEP_SUMMARY
-        echo "> 🏷️ **Git tag**: ${TAG}" >> $GITHUB_STEP_SUMMARY
-        echo "> 📝 **Release Notes**:" >> $GITHUB_STEP_SUMMARY
-        echo "> " >> $GITHUB_STEP_SUMMARY
-        echo "::group::📝 Release Notes"
-        printf ">   > \n" >> $GITHUB_STEP_SUMMARY
-        while IFS= read -r line; do
-          printf '%s\n' "$line" | sed 's/^/>\ /' | tee -a $GITHUB_STEP_SUMMARY
-        done < "$notes"
-        echo "::endgroup::"
+        if [ -f "$NOTES_FILE" ]; then
+          notes=$(cat "$NOTES_FILE" 2> /dev/null || true)
+          echo "> [!TIP]" >> $GITHUB_STEP_SUMMARY
+          echo "> ### Release Information" >> $GITHUB_STEP_SUMMARY
+          echo "> ✅ **Version**: ${VERSION}" >> $GITHUB_STEP_SUMMARY
+          echo "> 🏷️ **Git tag**: ${TAG}" >> $GITHUB_STEP_SUMMARY
+          echo "> 📝 **Release Notes**:" >> $GITHUB_STEP_SUMMARY
+          echo "> " >> $GITHUB_STEP_SUMMARY
+          echo "::group::📝 Release Notes"
+          printf ">   > \n" >> $GITHUB_STEP_SUMMARY
+          while IFS= read -r line; do
+            printf '%s\n' "$line" | sed 's/^/>\ /' | tee -a $GITHUB_STEP_SUMMARY
+          done < "$notes"
+          echo "::endgroup::"
+        fi
       env:
         TAG: ${{ steps.release.outputs.new-release-git-tag }}
         VERSION: ${{ steps.release.outputs.new-release-version }}
