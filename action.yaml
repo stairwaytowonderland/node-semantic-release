@@ -4,6 +4,20 @@ description: >
   release notes for safe transport.
 author: stairwaytowonderland
 inputs:
+  commit-author:
+    description: >
+      Git author for commits made by semantic-release when creating a release
+      (e.g. "github-actions[bot]");
+      Leave empty to use original author.
+    required: false
+    default: 'semantic-release-bot'
+  commit-email:
+    description: >
+      Git email for commits made by semantic-release when creating a release
+      (e.g. "41898282+github-actions[bot]@users.noreply.github.com");
+      Leave empty to use original author email.
+    required: false
+    default: 'semantic-release-bot@martynus.net'
   github-token:
     description: GitHub token passed to semantic-release (requires repo + write access).
     required: false
@@ -23,6 +37,10 @@ inputs:
     required: false
   changelog-file:
     description: Path to the generated changelog file to commit when using manual-tag mode.
+    required: false
+    default: ''
+  additional-assets:
+    description: Additional files to commit when using manual-tag mode (e.g. package.json).
     required: false
     default: ''
   publish:
@@ -135,21 +153,31 @@ runs:
       env:
         NOTES: ${{ steps.release.outputs.new-release-notes }}
 
-    # - name: Configure git
-    #   if: steps.release.outputs.new-release-published == 'true' && inputs.manual-tag == 'true'
-    #   shell: bash
-    #   run: |
-    #     git config --global user.name "github-actions[bot]"
-    #     git config --global user.email "41898282+github-actions[bot]@users.noreply.github.com"
-    #     # git config --global url."https://${GITHUB_TOKEN}@github.com/".insteadOf "https://github.com/"
-    #     # git config --global user.name "${{ github.actor }}"
-    #     # git config --global user.email "${{ github.actor }}@users.noreply.github.com"
-    #   # env:
-    #   #   GITHUB_TOKEN: ${{ inputs.github-token || github.token }}
+    - name: Configure git
+      if: steps.release.outputs.new-release-published == 'true' && inputs.manual-tag == 'true'
+      shell: bash
+      run: |
+        git config --global user.name "$COMMIT_AUTHOR"
+        git config --global user.email "$COMMIT_EMAIL"
+        # git config --global user.name "github-actions[bot]"
+        # git config --global user.email "41898282+github-actions[bot]@users.noreply.github.com"
+        # git config --global user.name "${{ github.actor }}"
+        # git config --global user.email "${{ github.actor }}@users.noreply.github.com"
+        # git config --global url."https://${GITHUB_TOKEN}@github.com/".insteadOf "https://github.com/"
+      env:
+        COMMIT_AUTHOR: ${{ inputs.commit-author || github.actor }}
+        COMMIT_EMAIL: ${{ inputs.commit-email || format('{0}@{1}', github.actor, 'users.noreply.github.com') }}
+      #   GITHUB_TOKEN: ${{ inputs.github-token || github.token }}
 
-    - name: Commit CHANGELOG
+    - name: Update version
+      if: steps.release.outputs.new-release-published == 'true' && inputs.manual-tag == 'true'
+      shell: bash
+      run: npm version ${VERSION} --no-git-tag-version
+      env:
+        VERSION: ${{ steps.release.outputs.new-release-version }}
+
+    - name: Update CHANGELOG
       if: steps.release.outputs.new-release-published == 'true' && inputs.manual-tag == 'true' && inputs.changelog-file != ''
-      id: changelog_commit
       shell: bash
       run: |
         notes_file=$(mktemp)
@@ -168,22 +196,30 @@ runs:
         fi
 
         rm -f "$notes_file"
-
-        git add "$CHANGELOG_FILE"
-        if git diff --cached --quiet; then
-          echo "No ${CHANGELOG_FILE} changes to commit."
-        else
-          git commit -m "chore(release): ${VERSION}"
-          git push origin "HEAD:${GITHUB_REF_NAME}"
-        fi
-        echo "commit_sha=$(git rev-parse HEAD)" >> "$GITHUB_OUTPUT"
       env:
-        VERSION: ${{ steps.release.outputs.new-release-version }}
         NOTES_B64: ${{ steps.encode.outputs.notes_b64 }}
         CHANGELOG_FILE: ${{ inputs.changelog-file }}
 
+    - name: Commit assets
+      if: steps.release.outputs.new-release-published == 'true' && inputs.manual-tag == 'true'
+      id: assets
+      shell: bash
+      run: |
+        git add "$CHANGELOG_FILE" ${ADDITIONAL_ASSETS}
+        if git diff --cached --quiet; then
+          echo "No changes to commit."
+        else
+          git commit -m "chore(release): ${VERSION}"
+          git push origin "HEAD:${GITHUB_REF_NAME}"
+          echo "commit_sha=$(git rev-parse HEAD)" >> "$GITHUB_OUTPUT"
+        fi
+      env:
+        VERSION: ${{ steps.release.outputs.new-release-version }}
+        CHANGELOG_FILE: ${{ inputs.changelog-file }}
+        ADDITIONAL_ASSETS: ${{ inputs.additional-assets }}
+
     - name: Create tag
-      if: steps.release.outputs.new-release-git-tag != '' && inputs.manual-tag == 'true'
+      if: steps.assets.outputs.commit_sha != ''
       shell: bash
       run: |
         {
@@ -195,35 +231,35 @@ runs:
         rm -f release-notes.md
       env:
         TAG: ${{ steps.release.outputs.new-release-git-tag }}
-        SHA: ${{ steps.changelog_commit.outputs.commit_sha }}
+        SHA: ${{ steps.assets.outputs.commit_sha }}
         NOTES_B64: ${{ steps.encode.outputs.notes_b64 }}
 
-    # - name: Show release information
-    #   if: steps.release.outputs.new-release-published == 'true'
-    #   shell: bash
-    #   run: |
-    #     if [ "$MANUAL_TAG" = "true" ]; then
-    #       echo "::notice::🚀 Tag created successfully!"
-    #     else
-    #       echo "::notice::🚀 Release created successfully!"
-    #     fi
-    #     echo "> [!TIP]" >> $GITHUB_STEP_SUMMARY
-    #     echo "> ### Release Information" >> $GITHUB_STEP_SUMMARY
-    #     echo "> ✅ **Released version**: ${VERSION}" >> $GITHUB_STEP_SUMMARY
-    #     echo "> 🏷️ **Git tag**: ${TAG}" >> $GITHUB_STEP_SUMMARY
-    #     echo "> 📝 **Release Notes**:" >> $GITHUB_STEP_SUMMARY
-    #     echo "> " >> $GITHUB_STEP_SUMMARY
-    #     echo "::group::📝 Release Notes"
-    #     printf "> \n" >> $GITHUB_STEP_SUMMARY
-    #     while IFS= read -r line; do
-    #       printf '%s\n' "$line" | sed 's/^/>\ /' | tee -a $GITHUB_STEP_SUMMARY
-    #     done < <(printf '%s' "$NOTES_B64" | base64 -d)
-    #     echo "::endgroup::"
-    #   env:
-    #     TAG: ${{ steps.release.outputs.new-release-git-tag }}
-    #     VERSION: ${{ steps.release.outputs.new-release-version }}
-    #     NOTES_B64: ${{ steps.encode.outputs.notes_b64 }}
-    #     MANUAL_TAG: ${{ inputs.manual-tag }}
+    - name: Show release information
+      if: steps.release.outputs.new-release-published == 'true'
+      shell: bash
+      run: |
+        if [ "$MANUAL_TAG" = "true" ]; then
+          echo "::notice::🚀 Tag created successfully!"
+        else
+          echo "::notice::🚀 Release created successfully!"
+        fi
+        echo "> [!TIP]" >> $GITHUB_STEP_SUMMARY
+        echo "> ### Release Information" >> $GITHUB_STEP_SUMMARY
+        echo "> ✅ **Version**: ${VERSION}" >> $GITHUB_STEP_SUMMARY
+        echo "> 🏷️ **Git tag**: ${TAG}" >> $GITHUB_STEP_SUMMARY
+        echo "> 📝 **Release Notes**:" >> $GITHUB_STEP_SUMMARY
+        echo "> " >> $GITHUB_STEP_SUMMARY
+        echo "::group::📝 Release Notes"
+        printf ">   > \n" >> $GITHUB_STEP_SUMMARY
+        while IFS= read -r line; do
+          printf '%s\n' "$line" | sed 's/^/>\ /' | tee -a $GITHUB_STEP_SUMMARY
+        done < <(printf '%s' "$NOTES_B64" | base64 -d)
+        echo "::endgroup::"
+      env:
+        TAG: ${{ steps.release.outputs.new-release-git-tag }}
+        VERSION: ${{ steps.release.outputs.new-release-version }}
+        NOTES_B64: ${{ steps.encode.outputs.notes_b64 }}
+        MANUAL_TAG: ${{ inputs.manual-tag }}
 
 branding:
   icon: tag
