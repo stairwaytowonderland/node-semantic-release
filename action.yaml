@@ -209,9 +209,9 @@ runs:
         else
           if [ -f "$NOTES_FILE" ]; then
             notes=$(cat "$NOTES_FILE")
-            git commit -m "chore(release): ${VERSION}\n\n${notes}"
+            git commit -m "chore(release): ${VERSION} [skip ci]\\n\\n${notes}"
           else
-            git commit -m "chore(release): ${VERSION}"
+            git commit -m "chore(release): ${VERSION} [skip ci]"
           fi
           git push origin "HEAD:${GITHUB_REF_NAME}"
           echo "commit_sha=$(git rev-parse HEAD)" >> "$GITHUB_OUTPUT"
@@ -259,12 +259,14 @@ runs:
         printf ">   > \n" >> $GITHUB_STEP_SUMMARY
         while IFS= read -r line; do
           printf '%s\n' "$line" | sed 's/^/>\ /' | tee -a $GITHUB_STEP_SUMMARY
-        done < <(printf '%s' "$NOTES_B64" | base64 -d)
+        done < "$NOTES_FILE"
+        # done < <(printf '%s' "$NOTES_B64" | base64 -d)
         echo "::endgroup::"
       env:
         TAG: ${{ steps.release.outputs.new-release-git-tag }}
         VERSION: ${{ steps.release.outputs.new-release-version }}
         NOTES_B64: ${{ steps.encode.outputs.notes_b64 }}
+        NOTES_FILE: release-notes.md
         MANUAL_TAG: ${{ inputs.manual-tag }}
 
 branding:
