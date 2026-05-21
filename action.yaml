@@ -239,12 +239,7 @@ runs:
       if: steps.assets.outputs.commit_sha != ''
       shell: bash
       run: |
-        # {
-        #   printf '%s' "$NOTES_B64" | base64 -d
-        #   printf '\n'
-        # } > "$NOTES_FILE"
-        notes=$(cat "$NOTES_FILE" 2> /dev/null || true)
-        git tag -a "$TAG" "$SHA" -F "$notes" --cleanup=verbatim
+        git tag -a "$TAG" "$SHA" -F "$NOTES_FILE" --cleanup=verbatim
         git push origin refs/tags/$TAG
       env:
         TAG: ${{ steps.release.outputs.new-release-git-tag }}
