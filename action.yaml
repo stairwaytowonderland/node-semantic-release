@@ -219,12 +219,17 @@ runs:
         if git diff --cached --quiet; then
           echo "No changes to commit."
         else
+          COMMIT_MESSAGE="chore(release): ${VERSION}"
           if [ -f "$NOTES_FILE" ]; then
             notes=$(cat "$NOTES_FILE" 2> /dev/null || true)
-            git commit -m "chore(release): ${VERSION} [skip ci]\\n\\n${notes}"
-          else
-            git commit -m "chore(release): ${VERSION} [skip ci]"
+            COMMIT_MESSAGE="$(cat <<EOF
+        $COMMIT_MESSAGE
+
+        $notes
+        EOF
+            )"
           fi
+          git commit -m "$COMMIT_MESSAGE"
           git push origin "HEAD:${GITHUB_REF_NAME}"
           echo "commit_sha=$(git rev-parse HEAD)" >> "$GITHUB_OUTPUT"
         fi
