@@ -83,7 +83,7 @@
 			"@semantic-release/exec",
 			{
 				"verifyReleaseCmd": "echo \"Running verifyReleaseCmd...\" && printf \"Version: '%s'\\n\" \"${nextRelease.version}\"",
-				"generateNotesCmd": "printf '%s\\n' \"${nextRelease.notes}\" > release-notes.md && npm version ${nextRelease.version} -m \"chore(release): ${nextRelease.version} [skip ci]\""
+				"generateNotesCmd": "npm version ${nextRelease.version} -m \"chore(release): ${nextRelease.version} [skip ci]\""
 			}
 		]
 	]
