@@ -67,27 +67,6 @@
 			{
 				"npmPublish": false
 			}
-		],
-		[
-			"@semantic-release/git",
-			{
-				"assets": [
-					"CHANGELOG.md",
-					"package.json",
-					"package-lock.json"
-				],
-				"message": "chore(release): ${nextRelease.version} [skip ci]\n\n${nextRelease.notes}"
-			}
-		],
-		[
-			"@semantic-release/exec",
-			{
-				"verifyReleaseCmd": "echo \"Running verifyReleaseCmd...\" && printf \"Version: '%s'\\n\" \"${nextRelease.version}\" && printf \"Notes: %s\\n\" \"${nextRelease.notes}\"",
-				"prepareCmd": "echo \"Running prepareCmd...\"",
-				"publishCmd": "echo \"Running publishCmd...\"",
-				"successCmd": "printf \"> [!TIP]\\n\" >> \"$GITHUB_STEP_SUMMARY\"; printf \"> ### Release Information\n>\n\" >> \"$GITHUB_STEP_SUMMARY\"; printf \"> ✅ **Version**: %s\n\" \"${nextRelease.version}\" >> \"$GITHUB_STEP_SUMMARY\"; printf \"> 🏷️ **Git Tag**: %s\n\" \"${nextRelease.gitTag}\" >> \"$GITHUB_STEP_SUMMARY\"; printf \"> 📝 **Release Notes**:\n\" >> \"$GITHUB_STEP_SUMMARY\"; printf '%s\\n' \"${nextRelease.notes}\" | sed 's/^/>   > /' >> \"$GITHUB_STEP_SUMMARY\"",
-				"failCmd": "echo \"🚨 Release failed!\""
-			}
 		]
 	]
 }
