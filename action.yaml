@@ -216,14 +216,6 @@ runs:
       run: |
         if [ -f package.json ]; then
           COMMIT_MESSAGE="${COMMIT_PREFIX}${VERSION}"
-          if [ -f "$NOTES_FILE" ]; then
-            notes=$(cat "$NOTES_FILE" 2> /dev/null || true)
-            COMMIT_MESSAGE="$(cat <<EOF
-        $COMMIT_MESSAGE
-
-        $notes
-        EOF
-            )"
           npm version "${VERSION}" -m "${COMMIT_PREFIX}${VERSION}"
         else
           echo "::warning::package.json not found. Skipping version update."
