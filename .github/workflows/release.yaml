@@ -1,6 +1,9 @@
 name: Release
 
 on:
+  # push:
+  #   branches: [main]
+  # workflow_dispatch:
   workflow_call:
     inputs:
       dispatch-workflow:
@@ -18,7 +21,7 @@ on:
         type: string
         required: false
         default: ''
-      additional-assets-json:
+      additional-assets:
         description: 'Additional files to commit when using manual-tag mode (e.g. package.json).'
         type: string
         required: false
@@ -77,7 +80,7 @@ jobs:
           github-token: ${{ secrets.github-token || secrets.GITHUB_TOKEN }}
           manual-tag: ${{ steps.vars.outputs.manual_tag }}
           changelog-file: ${{ inputs.changelog-file }}
-          additional-assets: ${{ join(fromJson(inputs.additional-assets-json), ' ') }}
+          additional-assets: ${{ inputs.additional-assets }}
           # ref: ${{ github.sha }}
 
       - name: Release failed
