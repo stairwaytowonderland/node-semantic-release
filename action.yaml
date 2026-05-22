@@ -39,8 +39,8 @@ inputs:
     description: Path to the generated changelog file to commit when using manual-tag mode.
     required: false
     default: ''
-  additional-assets:
-    description: Additional files to commit when using manual-tag mode (e.g. package.json).
+  additional-assets-json:
+    description: 'Additional files to commit when using manual-tag mode (e.g. package.json).'
     required: false
     default: ''
   publish:
