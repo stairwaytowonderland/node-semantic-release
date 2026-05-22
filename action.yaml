@@ -224,7 +224,7 @@ runs:
         $notes
         EOF
             )"
-          npm version "${VERSION}" -m "${COMMIT_PREFIX}${VERSION}" -m "$notes"
+          npm version "${VERSION}" -m "${COMMIT_PREFIX}${VERSION}"
         else
           echo "::warning::package.json not found. Skipping version update."
         fi
