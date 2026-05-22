@@ -224,7 +224,7 @@ runs:
         $notes
         EOF
             )"
-          npm version "${VERSION}" -m "$COMMIT_MESSAGE"
+          npm version "${VERSION}" -m "${COMMIT_PREFIX}${VERSION}" -m "$notes"
         else
           echo "::warning::package.json not found. Skipping version update."
         fi
@@ -279,17 +279,17 @@ runs:
     #     ASSETS: ${{ steps.prepare-assets.outputs.assets }}
     #     COMMIT_PREFIX: ${{ inputs.commit-prefix }}
 
-    - name: Create tag
-      # if: steps.commit-assets.outputs.commit_sha != ''
-      if: steps.release.outputs.new-release-published == 'true' && inputs.manual-tag == 'true'
-      shell: bash
-      run: |
-        git tag -a "$TAG" "$SHA" -F "$NOTES_FILE"
-        git push origin refs/tags/$TAG
-      env:
-        TAG: ${{ steps.release.outputs.new-release-git-tag }}
-        SHA: ${{ steps.commit-assets.outputs.commit_sha }}
-        NOTES_FILE: ${{ steps.notes.outputs.notes-file }}
+    # - name: Create tag
+    #   # if: steps.commit-assets.outputs.commit_sha != ''
+    #   if: steps.release.outputs.new-release-published == 'true' && inputs.manual-tag == 'true'
+    #   shell: bash
+    #   run: |
+    #     git tag -a "$TAG" "$SHA" -F "$NOTES_FILE"
+    #     git push origin refs/tags/$TAG
+    #   env:
+    #     TAG: ${{ steps.release.outputs.new-release-git-tag }}
+    #     SHA: ${{ steps.commit-assets.outputs.commit_sha }}
+    #     NOTES_FILE: ${{ steps.notes.outputs.notes-file }}
 
     - name: Show release information
       if: steps.release.outputs.new-release-published == 'true'
