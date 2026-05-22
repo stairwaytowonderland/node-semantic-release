@@ -18,6 +18,12 @@ inputs:
       Leave empty to use original author email.
     required: false
     default: 'semantic-release-bot@martynus.net'
+  commit-prefix:
+    description: >
+      Prefix for the commit message when semantic-release creates a release commit
+      (e.g. "chore(release):").
+    required: false
+    default: 'chore(release): '
   github-token:
     description: GitHub token passed to semantic-release (requires repo + write access).
     required: false
@@ -169,13 +175,6 @@ runs:
         COMMIT_EMAIL: ${{ inputs.commit-email || format('{0}@{1}', github.actor, 'users.noreply.github.com') }}
       #   GITHUB_TOKEN: ${{ inputs.github-token || github.token }}
 
-    - name: Update version
-      if: steps.release.outputs.new-release-published == 'true' && inputs.manual-tag == 'true'
-      shell: bash
-      run: npm version ${VERSION} --no-git-tag-version
-      env:
-        VERSION: ${{ steps.release.outputs.new-release-version }}
-
     - name: Decode release notes
       if: steps.release.outputs.new-release-published == 'true'
       id: notes
@@ -210,33 +209,13 @@ runs:
         NOTES_FILE: ${{ steps.notes.outputs.notes-file }}
         CHANGELOG_FILE: ${{ inputs.changelog-file }}
 
-    - name: Prepare commit assets
+    - name: Update version
       if: steps.release.outputs.new-release-published == 'true' && inputs.manual-tag == 'true'
-      id: prepare-assets
       shell: bash
+      # run: npm version ${VERSION} --no-git-tag-version
       run: |
-        if [ -n "$ASSETS_JSON" ]; then
-          # Convert JSON array to space-separated string
-          additional_assets=$(echo "$ASSETS_JSON" | jq -r '.[]' | xargs echo)
-          [ -z "$additional_assets" ] || assets="$CHANGELOG_FILE $additional_assets"
-        else
-          [ -z "$CHANGELOG_FILE" ] || assets="$CHANGELOG_FILE"
-        fi
-        echo "assets=$assets" >> "$GITHUB_OUTPUT"
-      env:
-        ASSETS_JSON: ${{ inputs.additional-assets-json }}
-        CHANGELOG_FILE: ${{ inputs.changelog-file }}
-
-    - name: Commit assets
-      if: steps.prepare-assets.outputs.assets != ''
-      id: commit-assets
-      shell: bash
-      run: |
-        git add "$ASSETS"
-        if git diff --cached --quiet; then
-          echo "No changes to commit."
-        else
-          COMMIT_MESSAGE="chore(release): ${VERSION}"
+        if [ -f package.json ]; then
+          COMMIT_MESSAGE="${COMMIT_PREFIX}${VERSION}"
           if [ -f "$NOTES_FILE" ]; then
             notes=$(cat "$NOTES_FILE" 2> /dev/null || true)
             COMMIT_MESSAGE="$(cat <<EOF
@@ -245,18 +224,64 @@ runs:
         $notes
         EOF
             )"
-          fi
-          git commit -m "$COMMIT_MESSAGE"
-          git push origin "HEAD:${GITHUB_REF_NAME}"
-          echo "commit_sha=$(git rev-parse HEAD)" >> "$GITHUB_OUTPUT"
+          npm version "${VERSION}" -m "$COMMIT_MESSAGE"
+        else
+          echo "::warning::package.json not found. Skipping version update."
         fi
       env:
         VERSION: ${{ steps.release.outputs.new-release-version }}
         NOTES_FILE: ${{ steps.notes.outputs.notes-file }}
-        ASSETS: ${{ steps.prepare-assets.outputs.assets }}
+        COMMIT_PREFIX: ${{ inputs.commit-prefix }}
+
+    # - name: Prepare commit assets
+    #   if: steps.release.outputs.new-release-published == 'true' && inputs.manual-tag == 'true'
+    #   id: prepare-assets
+    #   shell: bash
+    #   run: |
+    #     if [ -n "$ASSETS_JSON" ]; then
+    #       # Convert JSON array to space-separated string
+    #       additional_assets=$(echo "$ASSETS_JSON" | jq -r '.[]' | xargs echo)
+    #       [ -z "$additional_assets" ] || assets="$CHANGELOG_FILE $additional_assets"
+    #     else
+    #       [ -z "$CHANGELOG_FILE" ] || assets="$CHANGELOG_FILE"
+    #     fi
+    #     echo "assets=$assets" >> "$GITHUB_OUTPUT"
+    #   env:
+    #     ASSETS_JSON: ${{ inputs.additional-assets-json }}
+    #     CHANGELOG_FILE: ${{ inputs.changelog-file }}
+
+    # - name: Commit assets
+    #   if: steps.prepare-assets.outputs.assets != ''
+    #   id: commit-assets
+    #   shell: bash
+    #   run: |
+    #     git add "$ASSETS"
+    #     if git diff --cached --quiet; then
+    #       echo "No changes to commit."
+    #     else
+    #       COMMIT_MESSAGE="${COMMIT_PREFIX}${VERSION}"
+    #       if [ -f "$NOTES_FILE" ]; then
+    #         notes=$(cat "$NOTES_FILE" 2> /dev/null || true)
+    #         COMMIT_MESSAGE="$(cat <<EOF
+    #     $COMMIT_MESSAGE
+
+    #     $notes
+    #     EOF
+    #         )"
+    #       fi
+    #       git commit -m "$COMMIT_MESSAGE"
+    #       git push origin "HEAD:${GITHUB_REF_NAME}"
+    #       echo "commit_sha=$(git rev-parse HEAD)" >> "$GITHUB_OUTPUT"
+    #     fi
+    #   env:
+    #     VERSION: ${{ steps.release.outputs.new-release-version }}
+    #     NOTES_FILE: ${{ steps.notes.outputs.notes-file }}
+    #     ASSETS: ${{ steps.prepare-assets.outputs.assets }}
+    #     COMMIT_PREFIX: ${{ inputs.commit-prefix }}
 
     - name: Create tag
-      if: steps.commit-assets.outputs.commit_sha != ''
+      # if: steps.commit-assets.outputs.commit_sha != ''
+      if: steps.release.outputs.new-release-published == 'true' && inputs.manual-tag == 'true'
       shell: bash
       run: |
         git tag -a "$TAG" "$SHA" -F "$NOTES_FILE"
