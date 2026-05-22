@@ -5,25 +5,7 @@ on:
     branches: [main]
     paths-ignore:
       - 'CHANGELOG.md'
-      - 'package.json'
-      - 'package-lock.json'
   workflow_dispatch:
-    inputs:
-      changelog-file:
-        description: 'Path to the generated changelog file to commit when using manual-tag mode.'
-        type: string
-        required: false
-        default: 'CHANGELOG.md'
-      additional-assets-json:
-        description: 'Additional files to commit when using manual-tag mode (e.g. package.json).'
-        type: string
-        required: false
-        default: '["package.json","package-lock.json"]'
-      fail-on-no-release:
-        description: 'Fail the workflow if no release is published (e.g. if there are no relevant commits).'
-        type: boolean
-        required: false
-        default: true
 
 # Use PAT instead of GITHUB_TOKEN to cause semantic-release to trigger tag pipeline when tag is created.
 # 'Fine-grained token' repo permissions: Contents
@@ -31,11 +13,12 @@ on:
 jobs:
   release:
     name: Release
+    if: ${{ !startsWith(github.event.head_commit.message, 'chore(release):') }}
     uses: ./.github/workflows/release.yaml
     with:
       # dispatch-workflow: publish.yaml
-      fail-on-no-release: ${{ inputs.fail-on-no-release }}
-      changelog-file: ${{ inputs.changelog-file }}
+      fail-on-no-release: true
+      changelog-file: 'CHANGELOG.md'
       additional-assets: 'package.json package-lock.json'
     secrets:
       github-token: ${{ secrets.GH_PAT_CREATE_RELEASE }}
