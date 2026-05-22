@@ -210,12 +210,29 @@ runs:
         NOTES_FILE: ${{ steps.notes.outputs.notes-file }}
         CHANGELOG_FILE: ${{ inputs.changelog-file }}
 
-    - name: Commit assets
+    - name: Prepare commit assets
       if: steps.release.outputs.new-release-published == 'true' && inputs.manual-tag == 'true'
-      id: assets
+      id: prepare-assets
       shell: bash
       run: |
-        git add "$CHANGELOG_FILE" ${ADDITIONAL_ASSETS}
+        if [ -n "$ASSETS_JSON" ]; then
+          # Convert JSON array to space-separated string
+          additional_assets=$(echo "$ASSETS_JSON" | jq -r '.[]' | xargs echo)
+          [ -z "$additional_assets" ] || assets="$CHANGELOG_FILE $additional_assets"
+        else
+          [ -z "$CHANGELOG_FILE" ] || assets="$CHANGELOG_FILE"
+        fi
+        echo "assets=$assets" >> "$GITHUB_OUTPUT"
+      env:
+        ASSETS_JSON: ${{ inputs.additional-assets-json }}
+        CHANGELOG_FILE: ${{ inputs.changelog-file }}
+
+    - name: Commit assets
+      if: steps.prepare-assets.outputs.assets != ''
+      id: commit-assets
+      shell: bash
+      run: |
+        git add "$ASSETS"
         if git diff --cached --quiet; then
           echo "No changes to commit."
         else
@@ -236,18 +253,17 @@ runs:
       env:
         VERSION: ${{ steps.release.outputs.new-release-version }}
         NOTES_FILE: ${{ steps.notes.outputs.notes-file }}
-        CHANGELOG_FILE: ${{ inputs.changelog-file }}
-        ADDITIONAL_ASSETS: ${{ inputs.additional-assets }}
+        ASSETS: ${{ steps.prepare-assets.outputs.assets }}
 
     - name: Create tag
-      if: steps.assets.outputs.commit_sha != ''
+      if: steps.commit-assets.outputs.commit_sha != ''
       shell: bash
       run: |
         git tag -a "$TAG" "$SHA" -F "$NOTES_FILE"
         git push origin refs/tags/$TAG
       env:
         TAG: ${{ steps.release.outputs.new-release-git-tag }}
-        SHA: ${{ steps.assets.outputs.commit_sha }}
+        SHA: ${{ steps.commit-assets.outputs.commit_sha }}
         NOTES_FILE: ${{ steps.notes.outputs.notes-file }}
 
     - name: Show release information

@@ -37,6 +37,6 @@ jobs:
       # dispatch-workflow: publish.yaml
       fail-on-no-release: false
       changelog-file: ${{ inputs.changelog-file || 'CHANGELOG.md' }}
-      additional-assets: ${{ join(fromJson(inputs.additional-assets-json), ' ') || 'package.json package-lock.json' }}
+      additional-assets: ${{ inputs.additional-assets-json }}
     secrets:
       github-token: ${{ secrets.GH_PAT_CREATE_RELEASE }}

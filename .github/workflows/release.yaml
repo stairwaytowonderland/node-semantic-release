@@ -21,7 +21,7 @@ on:
         type: string
         required: false
         default: ''
-      additional-assets:
+      additional-assets-json:
         description: 'Additional files to commit when using manual-tag mode (e.g. package.json).'
         type: string
         required: false
@@ -80,7 +80,7 @@ jobs:
           github-token: ${{ secrets.github-token || secrets.GITHUB_TOKEN }}
           manual-tag: ${{ steps.vars.outputs.manual_tag }}
           changelog-file: ${{ inputs.changelog-file }}
-          additional-assets: ${{ inputs.additional-assets }}
+          additional-assets-json: ${{ inputs.additional-assets-json }}
           # ref: ${{ github.sha }}
 
       - name: Release failed
