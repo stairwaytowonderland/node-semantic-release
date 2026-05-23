@@ -144,86 +144,77 @@ runs:
         MANUAL_TAG: ${{ inputs.manual-tag }}
         DRY_RUN_FLAG: ${{ inputs.manual-tag == 'true' && '--dry-run' || '' }}
 
-    - name: Encode release notes
-      if: steps.release.outputs.new-release-published == 'true'
-      id: encode
-      shell: bash
-      # Encode the new release notes as a base64 string to safely
-      # pass through the workflow dispatch fields.
-      run: printf '%s' "$NOTES" | base64 -w 0 | xargs -I{} echo "notes_b64={}" >> "$GITHUB_OUTPUT"
-      # The release notes from steps.release.outputs.new-release-notes
-      # can contain arbitrary Markdown — newlines, special characters,
-      # quotes — that would break if interpolated directly into the run
-      # command via ${{ }}. Passing it through an environment variable
-      # lets the shell handle it safely as a raw string.
-      env:
-        NOTES: ${{ steps.release.outputs.new-release-notes }}
+    # - name: Encode release notes
+    #   if: steps.release.outputs.new-release-published == 'true'
+    #   id: encode
+    #   shell: bash
+    #   # Encode the new release notes as a base64 string to safely
+    #   # pass through the workflow dispatch fields.
+    #   run: printf '%s' "$NOTES" | base64 -w 0 | xargs -I{} echo "notes_b64={}" >> "$GITHUB_OUTPUT"
+    #   # The release notes from steps.release.outputs.new-release-notes
+    #   # can contain arbitrary Markdown — newlines, special characters,
+    #   # quotes — that would break if interpolated directly into the run
+    #   # command via ${{ }}. Passing it through an environment variable
+    #   # lets the shell handle it safely as a raw string.
+    #   env:
+    #     NOTES: ${{ steps.release.outputs.new-release-notes }}
 
-    - name: Configure git
-      if: steps.release.outputs.new-release-published == 'true' && inputs.manual-tag == 'true'
-      shell: bash
-      run: |
-        git config --global commit.cleanup verbatim
-        git config --global user.name "$COMMIT_AUTHOR"
-        git config --global user.email "$COMMIT_EMAIL"
-        # git config --global user.name "github-actions[bot]"
-        # git config --global user.email "41898282+github-actions[bot]@users.noreply.github.com"
-        # git config --global user.name "semantic-release-bot"
-        # git config --global user.email "semantic-release-bot@martynus.net"
-      env:
-        COMMIT_AUTHOR: ${{ inputs.commit-author || github.actor }}
-        COMMIT_EMAIL: ${{ inputs.commit-email || format('{0}@{1}', github.actor, 'users.noreply.github.com') }}
-      #   GITHUB_TOKEN: ${{ inputs.github-token || github.token }}
+    # - name: Configure git
+    #   if: steps.release.outputs.new-release-published == 'true' && inputs.manual-tag == 'true'
+    #   shell: bash
+    #   run: |
+    #     git config --global commit.cleanup verbatim
+    #     git config --global user.name "$COMMIT_AUTHOR"
+    #     git config --global user.email "$COMMIT_EMAIL"
+    #     # git config --global user.name "github-actions[bot]"
+    #     # git config --global user.email "41898282+github-actions[bot]@users.noreply.github.com"
+    #     # git config --global user.name "semantic-release-bot"
+    #     # git config --global user.email "semantic-release-bot@martynus.net"
+    #   env:
+    #     COMMIT_AUTHOR: ${{ inputs.commit-author || github.actor }}
+    #     COMMIT_EMAIL: ${{ inputs.commit-email || format('{0}@{1}', github.actor, 'users.noreply.github.com') }}
+    #   #   GITHUB_TOKEN: ${{ inputs.github-token || github.token }}
 
-    - name: Decode release notes
-      if: steps.release.outputs.new-release-published == 'true'
-      id: notes
-      shell: bash
-      run: |
-        {
-          printf '%s' "$NOTES_B64" | base64 -d
-          printf '\n'
-        } > "$NOTES_FILE"
-        echo "notes-file=$NOTES_FILE" >> "$GITHUB_OUTPUT"
-      env:
-        NOTES_B64: ${{ steps.encode.outputs.notes_b64 }}
-        NOTES_FILE: release-notes.md
+    # - name: Decode release notes
+    #   if: steps.release.outputs.new-release-published == 'true'
+    #   id: notes
+    #   shell: bash
+    #   run: |
+    #     {
+    #       printf '%s' "$NOTES_B64" | base64 -d
+    #       printf '\n'
+    #     } > "$NOTES_FILE"
+    #     echo "notes-file=$NOTES_FILE" >> "$GITHUB_OUTPUT"
+    #   env:
+    #     NOTES_B64: ${{ steps.encode.outputs.notes_b64 }}
+    #     NOTES_FILE: release-notes.md
 
-    - name: Update CHANGELOG
-      if: steps.release.outputs.new-release-published == 'true' && inputs.manual-tag == 'true' && inputs.changelog-file != ''
-      id: changelog
-      shell: bash
-      run: |
-        if [ -f "$CHANGELOG_FILE" ]; then
-          cp "$CHANGELOG_FILE" "${CHANGELOG_FILE}.bak"
-          {
-            cat "$NOTES_FILE"
-            printf '\n\n'
-            cat "${CHANGELOG_FILE}.bak"
-          } > "$CHANGELOG_FILE"
-          rm -f "${CHANGELOG_FILE}.bak"
-        else
-          cat "$NOTES_FILE" > "$CHANGELOG_FILE"
-        fi
-      env:
-        NOTES_FILE: ${{ steps.notes.outputs.notes-file }}
-        CHANGELOG_FILE: ${{ inputs.changelog-file }}
+    # - name: Update CHANGELOG
+    #   if: steps.release.outputs.new-release-published == 'true' && inputs.manual-tag == 'true' && inputs.changelog-file != ''
+    #   id: changelog
+    #   shell: bash
+    #   run: |
+    #     if [ -f "$CHANGELOG_FILE" ]; then
+    #       cp "$CHANGELOG_FILE" "${CHANGELOG_FILE}.bak"
+    #       {
+    #         cat "$NOTES_FILE"
+    #         printf '\n\n'
+    #         cat "${CHANGELOG_FILE}.bak"
+    #       } > "$CHANGELOG_FILE"
+    #       rm -f "${CHANGELOG_FILE}.bak"
+    #     else
+    #       cat "$NOTES_FILE" > "$CHANGELOG_FILE"
+    #     fi
+    #   env:
+    #     NOTES_FILE: ${{ steps.notes.outputs.notes-file }}
+    #     CHANGELOG_FILE: ${{ inputs.changelog-file }}
 
-    - name: Update version
-      if: steps.release.outputs.new-release-published == 'true' && inputs.manual-tag == 'true'
-      shell: bash
-      # run: npm version ${VERSION} --no-git-tag-version
-      run: |
-        if [ -f package.json ]; then
-          COMMIT_MESSAGE="${COMMIT_PREFIX}${VERSION}"
-          npm version "${VERSION}" -m "${COMMIT_PREFIX}${VERSION}"
-        else
-          echo "::warning::package.json not found. Skipping version update."
-        fi
-      env:
-        VERSION: ${{ steps.release.outputs.new-release-version }}
-        NOTES_FILE: ${{ steps.notes.outputs.notes-file }}
-        COMMIT_PREFIX: ${{ inputs.commit-prefix }}
+    # - name: Update version
+    #   if: steps.release.outputs.new-release-published == 'true' && inputs.manual-tag == 'true'
+    #   shell: bash
+    #   run: npm version ${VERSION} --no-git-tag-version
+    #   env:
+    #     VERSION: ${{ steps.release.outputs.new-release-version }}
 
     # - name: Prepare commit assets
     #   if: steps.release.outputs.new-release-published == 'true' && inputs.manual-tag == 'true'
