@@ -51,6 +51,7 @@ jobs:
       new-release-version: ${{ steps.release.outputs.new-release-version }}
       new-release-git-tag: ${{ steps.release.outputs.new-release-git-tag }}
       new-release-notes: ${{ steps.release.outputs.new-release-notes }}
+      new-release-notes-file: ${{ steps.release.outputs.new-release-notes-file }}
       new-release-notes-base64: ${{ steps.release.outputs.new-release-notes-base64 }}
 
     steps:
@@ -73,13 +74,9 @@ jobs:
       - name: Set vars
         id: vars
         run: |
-          if [ -n "$DISPATCH_WORKFLOW" ]; then
-            echo "dispatch-workflow=false" >> "$GITHUB_OUTPUT"
-          else
-            echo "dispatch-workflow=true" >> "$GITHUB_OUTPUT"
-          fi
+          echo "is-dispatch-workflow=$DISPATCH_WORKFLOW" >> "$GITHUB_OUTPUT"
         env:
-          DISPATCH_WORKFLOW: ${{ secrets.github-token != secrets.GITHUB_TOKEN && inputs.dispatch-workflow || '' }}
+          DISPATCH_WORKFLOW: ${{ secrets.github-token != secrets.GITHUB_TOKEN && inputs.dispatch-workflow != '' }}
 
       - name: Semantic release
         id: release
@@ -98,10 +95,10 @@ jobs:
             core.setFailed('Release failed')
 
       - name: Dispatch Publish workflow
-        if: steps.release.outputs.new-release-published == 'true' && steps.vars.outputs.dispatch-workflow != ''
+        if: steps.release.outputs.new-release-published == 'true' && steps.vars.outputs.is-dispatch-workflow == 'true'
         uses: stairwaytowonderland/simple-workflow-dispatch@main
         with:
-          workflow: ${{ steps.vars.outputs.dispatch-workflow }}
+          workflow: ${{ inputs.dispatch-workflow }}
           tag: ${{ steps.release.outputs.new-release-git-tag }}
           fields: |
             notes-b64=${{ steps.release.outputs.new-release-notes-base64 }}
