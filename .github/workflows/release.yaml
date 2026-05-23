@@ -71,7 +71,7 @@ jobs:
             echo "dispatch-workflow=true" >> "$GITHUB_OUTPUT"
           fi
         env:
-          DISPATCH_WORKFLOW: ${{ secrets.github-token != secrets.GITHUB_TOKEN && inputs.dispatch-workflow || '' }}
+          DISPATCH_WORKFLOW: ${{ secrets.github-token == secrets.GITHUB_TOKEN && inputs.dispatch-workflow || '' }}
 
       - name: Semantic release
         id: release
