@@ -74,20 +74,11 @@ outputs:
     value: ${{ steps.release.outputs.new-release-notes }}
   new-release-notes-base64:
     description: Base64-encoded release notes.
-    value: ${{ steps.encode.outputs.notes_b64 }}
+    value: ${{ steps.encode.outputs.notes-b64 }}
 
 runs:
   using: composite
   steps:
-    - name: Checkout action repository
-      uses: actions/checkout@v6
-      with:
-        token: ${{ inputs.github-token || github.token }}
-        repository: ${{ github.action_repository }}
-        ref: ${{ github.action_ref }}
-        path: ./.node-semantic-release
-        persist-credentials: false
-
     - name: Setup Node.js
       uses: actions/setup-node@v6
       with:
@@ -99,7 +90,7 @@ runs:
       run: |
         if [ ! -f package.json ]; then
           echo "::warning::package.json not found. Copying default configuration."
-          cp ./.node-semantic-release/templates/package.json ./package.json
+          cp "${GITHUB_ACTION_PATH}/templates/package.json" ./package.json
           npm install --package-lock-only
         fi
 
@@ -131,7 +122,7 @@ runs:
       run: |
         if [ ! -f .releaserc ]; then
           echo "::warning::.releaserc not found. Copying default configuration."
-          cp ./.node-semantic-release/templates/releaserc.json ./.releaserc
+          cp "${GITHUB_ACTION_PATH}/templates/releaserc.json" ./.releaserc
         fi
 
     - name: Release
@@ -146,11 +137,16 @@ runs:
 
     # - name: Encode release notes
     #   if: steps.release.outputs.new-release-published == 'true'
-    #   id: encode
+    #   id: notes
     #   shell: bash
     #   # Encode the new release notes as a base64 string to safely
     #   # pass through the workflow dispatch fields.
-    #   run: printf '%s' "$NOTES" | base64 -w 0 | xargs -I{} echo "notes_b64={}" >> "$GITHUB_OUTPUT"
+    #   run: |
+    #     printf '%s' "$NOTES" | base64 -w 0 | xargs -I{} echo "notes-b64={}" >> "$GITHUB_OUTPUT"
+    #     {
+    #       printf '%s' "$NOTES_B64" | base64 -d
+    #       printf '\n'
+    #     } > "$NOTES_FILE"
     #   # The release notes from steps.release.outputs.new-release-notes
     #   # can contain arbitrary Markdown — newlines, special characters,
     #   # quotes — that would break if interpolated directly into the run
@@ -158,36 +154,7 @@ runs:
     #   # lets the shell handle it safely as a raw string.
     #   env:
     #     NOTES: ${{ steps.release.outputs.new-release-notes }}
-
-    # - name: Configure git
-    #   if: steps.release.outputs.new-release-published == 'true' && inputs.manual-tag == 'true'
-    #   shell: bash
-    #   run: |
-    #     git config --global commit.cleanup verbatim
-    #     git config --global user.name "$COMMIT_AUTHOR"
-    #     git config --global user.email "$COMMIT_EMAIL"
-    #     # git config --global user.name "github-actions[bot]"
-    #     # git config --global user.email "41898282+github-actions[bot]@users.noreply.github.com"
-    #     # git config --global user.name "semantic-release-bot"
-    #     # git config --global user.email "semantic-release-bot@martynus.net"
-    #   env:
-    #     COMMIT_AUTHOR: ${{ inputs.commit-author || github.actor }}
-    #     COMMIT_EMAIL: ${{ inputs.commit-email || format('{0}@{1}', github.actor, 'users.noreply.github.com') }}
-    #   #   GITHUB_TOKEN: ${{ inputs.github-token || github.token }}
-
-    # - name: Decode release notes
-    #   if: steps.release.outputs.new-release-published == 'true'
-    #   id: notes
-    #   shell: bash
-    #   run: |
-    #     {
-    #       printf '%s' "$NOTES_B64" | base64 -d
-    #       printf '\n'
-    #     } > "$NOTES_FILE"
-    #     echo "notes-file=$NOTES_FILE" >> "$GITHUB_OUTPUT"
-    #   env:
-    #     NOTES_B64: ${{ steps.encode.outputs.notes_b64 }}
-    #     NOTES_FILE: release-notes.md
+    #     NOTES_FILE: ${{ github.workspace }}/release-notes.md
 
     # - name: Update CHANGELOG
     #   if: steps.release.outputs.new-release-published == 'true' && inputs.manual-tag == 'true' && inputs.changelog-file != ''
@@ -215,6 +182,27 @@ runs:
     #   run: npm version ${VERSION} --no-git-tag-version
     #   env:
     #     VERSION: ${{ steps.release.outputs.new-release-version }}
+
+    # - name: Configure git
+    #   if: steps.release.outputs.new-release-published == 'true' && inputs.manual-tag == 'true'
+    #   shell: bash
+    #   run: |
+    #     git config --global commit.cleanup verbatim
+    #     git config --global user.name "$COMMIT_AUTHOR"
+    #     git config --global user.email "$COMMIT_EMAIL"
+    #     # git config --global user.name "github-actions[bot]"
+    #     # git config --global user.email "41898282+github-actions[bot]@users.noreply.github.com"
+    #     # git config --global user.name "semantic-release-bot"
+    #     # git config --global user.email "semantic-release-bot@martynus.net"
+
+    #     git config --global core.excludesfile "$EXCLUDE_FILE"
+    #     echo "$NOTES_FILE" >> "$EXCLUDE_FILE"
+    #   env:
+    #     COMMIT_AUTHOR: ${{ inputs.commit-author || github.actor }}
+    #     COMMIT_EMAIL: ${{ inputs.commit-email || format('{0}@{1}', github.actor, 'users.noreply.github.com') }}
+    #     NOTES_FILE: ${{ steps.notes.outputs.notes-file }}
+    #     EXCLUDE_FILE: ${{ github.workspace }}/.gitignore_global
+    #   #   GITHUB_TOKEN: ${{ inputs.github-token || github.token }}
 
     # - name: Prepare commit assets
     #   if: steps.release.outputs.new-release-published == 'true' && inputs.manual-tag == 'true'

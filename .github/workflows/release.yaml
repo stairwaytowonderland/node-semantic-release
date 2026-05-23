@@ -54,17 +54,6 @@ jobs:
       new-release-notes-base64: ${{ steps.release.outputs.new-release-notes-base64 }}
 
     steps:
-      - name: Set manual_tag
-        id: vars
-        run: |
-          if [ -n "$DISPATCH_WORKFLOW" ]; then
-            echo "manual_tag=false" >> "$GITHUB_OUTPUT"
-          else
-            echo "manual_tag=true" >> "$GITHUB_OUTPUT"
-          fi
-        env:
-          DISPATCH_WORKFLOW: ${{ inputs.dispatch-workflow }}
-
       - name: Checkout
         uses: actions/checkout@v6
         with:
@@ -73,12 +62,23 @@ jobs:
           # ref: ${{ github.sha }}
           # persist-credentials: false
 
+      - name: Set vars
+        id: vars
+        run: |
+          if [ -n "$DISPATCH_WORKFLOW" ]; then
+            echo "manual-tag=false" >> "$GITHUB_OUTPUT"
+          else
+            echo "manual-tag=true" >> "$GITHUB_OUTPUT"
+          fi
+        env:
+          DISPATCH_WORKFLOW: ${{ inputs.dispatch-workflow }}
+
       - name: Semantic release
         id: release
         uses: ./
         with:
           github-token: ${{ secrets.github-token || secrets.GITHUB_TOKEN }}
-          manual-tag: ${{ steps.vars.outputs.manual_tag }}
+          # manual-tag: ${{ steps.vars.outputs.manual-tag }}
           changelog-file: ${{ inputs.changelog-file }}
           additional-assets-json: ${{ inputs.additional-assets-json }}
           # ref: ${{ github.sha }}
