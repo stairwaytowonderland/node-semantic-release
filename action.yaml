@@ -153,8 +153,8 @@ runs:
           printf '%s' "$NOTES_B64" | base64 -d
           printf '\n'
         } > "$NOTES_FILE"
-        notes-file="$NOTES_FILE"
-        echo "::notice file=$NOTES_FILE::$(cat "$NOTES_FILE")"
+        echo "notes-file=$NOTES_FILE" >> "$GITHUB_OUTPUT"
+        echo "::notice Release Notes::$(cat "$NOTES_FILE")"
       # The release notes from steps.release.outputs.new-release-notes
       # can contain arbitrary Markdown — newlines, special characters,
       # quotes — that would break if interpolated directly into the run
