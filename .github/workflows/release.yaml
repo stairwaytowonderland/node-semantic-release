@@ -66,19 +66,18 @@ jobs:
         id: vars
         run: |
           if [ -n "$DISPATCH_WORKFLOW" ]; then
-            echo "manual-tag=false" >> "$GITHUB_OUTPUT"
+            echo "dispatch-workflow=false" >> "$GITHUB_OUTPUT"
           else
-            echo "manual-tag=true" >> "$GITHUB_OUTPUT"
+            echo "dispatch-workflow=true" >> "$GITHUB_OUTPUT"
           fi
         env:
-          DISPATCH_WORKFLOW: ${{ inputs.dispatch-workflow }}
+          DISPATCH_WORKFLOW: ${{ secrets.github-token != secrets.GITHUB_TOKEN && inputs.dispatch-workflow || '' }}
 
       - name: Semantic release
         id: release
         uses: ./
         with:
           github-token: ${{ secrets.github-token || secrets.GITHUB_TOKEN }}
-          # manual-tag: ${{ steps.vars.outputs.manual-tag }}
           changelog-file: ${{ inputs.changelog-file }}
           additional-assets-json: ${{ inputs.additional-assets-json }}
           # ref: ${{ github.sha }}
@@ -91,7 +90,7 @@ jobs:
             core.setFailed('Release failed')
 
       - name: Dispatch Publish workflow
-        if: steps.release.outputs.new-release-published == 'true' && inputs.dispatch-workflow != ''
+        if: steps.release.outputs.new-release-published == 'true' && steps.vars.outputs.dispatch-workflow != ''
         uses: stairwaytowonderland/simple-workflow-dispatch@main
         with:
           workflow: ${{ inputs.dispatch-workflow }}
