@@ -16,14 +16,6 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Debug info
-        run: |
-          printf "HEAD_COMMIT_AUTHOR_NAME:\n%s\n" "$HEAD_COMMIT_AUTHOR_NAME"
-          printf "HEAD_COMMIT_MESSAGE:\n%s\n" "$HEAD_COMMIT_MESSAGE"
-        env:
-          HEAD_COMMIT_AUTHOR_NAME: ${{ github.event.head_commit.author.name }}
-          HEAD_COMMIT_MESSAGE: ${{ github.event.head_commit.message }}
-
       - name: Dispatch Publish workflow
         if: ${{ (github.event.head_commit.author.name != 'semantic-release-bot' && github.event.head_commit.author.name != 'github-actions[bot]') && !startsWith(github.event.head_commit.message, 'chore(release):') }}
         uses: stairwaytowonderland/simple-workflow-dispatch@main
