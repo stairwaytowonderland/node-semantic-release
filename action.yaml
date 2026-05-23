@@ -150,7 +150,7 @@ runs:
       run: |
         printf '%s' "$NOTES" | base64 -w 0 | xargs -I{} echo "notes-b64={}" >> "$GITHUB_OUTPUT"
         {
-          printf '%s' "$NOTES" | base64 -d
+          printf '%s' "$NOTES"
           printf '\n'
         } > "$NOTES_FILE"
         echo "notes-file=$NOTES_FILE" >> "$GITHUB_OUTPUT"
