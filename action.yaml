@@ -80,7 +80,7 @@ outputs:
     value: ${{ steps.notes.outputs.notes-file }}
   new-release-notes-base64:
     description: Base64-encoded release notes.
-    value: ${{ steps.notes.outputs.notes-b64 }}
+    value: ${{ steps.encode.outputs.notes-b64 }}
 
 runs:
   using: composite
@@ -141,19 +141,26 @@ runs:
         GITHUB_TOKEN: ${{ inputs.github-token || github.token }}
         DRY_RUN_FLAG: ${{ inputs.manual-tag == 'true' || inputs.dry-run == 'true' && '--dry-run' || '' }}
 
-    - name: Encode release notes
+    - name: Set notes file
       if: steps.release.outputs.new-release-published == 'true'
       id: notes
       shell: bash
+      run: |
+        cat > "$NOTES_FILE" <<EOF
+        ${NOTES}
+        EOF
+        echo "notes-file=${NOTES_FILE}" >> "$GITHUB_OUTPUT"
+      env:
+        NOTES: ${{ steps.release.outputs.new-release-notes }}
+        NOTES_FILE: ${{ github.workspace }}/release-notes.md
+
+    - name: Encode release notes
+      if: steps.release.outputs.new-release-published == 'true'
+      id: encode
+      shell: bash
       # Encode the new release notes as a base64 string to safely
       # pass through the workflow dispatch fields.
-      run: |
-        printf '%s' "$NOTES" | base64 -w 0 | xargs -I{} echo "notes-b64={}" >> "$GITHUB_OUTPUT"
-        {
-          printf '%s' "$NOTES"
-          printf '\n'
-        } > "$NOTES_FILE"
-        echo "notes-file=$NOTES_FILE" >> "$GITHUB_OUTPUT"
+      run: printf '%s' "$NOTES" | base64 -w 0 | xargs -I{} echo "notes-b64={}" >> "$GITHUB_OUTPUT"
       # The release notes from steps.release.outputs.new-release-notes
       # can contain arbitrary Markdown — newlines, special characters,
       # quotes — that would break if interpolated directly into the run
@@ -161,7 +168,6 @@ runs:
       # lets the shell handle it safely as a raw string.
       env:
         NOTES: ${{ steps.release.outputs.new-release-notes }}
-        NOTES_FILE: ${{ github.workspace }}/release-notes.md
 
     - name: Update CHANGELOG
       if: steps.release.outputs.new-release-published == 'true' && inputs.manual-tag == 'true' && inputs.changelog-file != ''
