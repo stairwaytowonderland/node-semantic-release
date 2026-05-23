@@ -55,14 +55,6 @@ jobs:
       new-release-notes-base64: ${{ steps.release.outputs.new-release-notes-base64 }}
 
     steps:
-      - name: Debug info
-        run: |
-          printf "HEAD_COMMIT_AUTHOR_NAME:\n%s\n" "$HEAD_COMMIT_AUTHOR_NAME"
-          printf "HEAD_COMMIT_MESSAGE:\n%s\n" "$HEAD_COMMIT_MESSAGE"
-        env:
-          HEAD_COMMIT_AUTHOR_NAME: ${{ github.event.head_commit.author.name }}
-          HEAD_COMMIT_MESSAGE: ${{ github.event.head_commit.message }}
-
       - name: Checkout
         uses: actions/checkout@v6
         with:
@@ -74,9 +66,9 @@ jobs:
       - name: Set vars
         id: vars
         run: |
-          echo "is-dispatch-workflow=$DISPATCH_WORKFLOW" >> "$GITHUB_OUTPUT"
+          echo "is-dispatch-workflow=$IS_DISPATCH_WORKFLOW" >> "$GITHUB_OUTPUT"
         env:
-          DISPATCH_WORKFLOW: ${{ secrets.github-token != secrets.GITHUB_TOKEN && inputs.dispatch-workflow != '' }}
+          IS_DISPATCH_WORKFLOW: ${{ secrets.github-token != secrets.GITHUB_TOKEN && inputs.dispatch-workflow != '' }}
 
       - name: Semantic release
         id: release

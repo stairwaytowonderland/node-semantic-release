@@ -152,7 +152,7 @@ runs:
         echo "notes-file=${NOTES_FILE}" >> "$GITHUB_OUTPUT"
       env:
         NOTES: ${{ steps.release.outputs.new-release-notes }}
-        NOTES_FILE: ${{ github.workspace }}/release-notes.md
+        NOTES_FILE: ${{ github.workspace }}/.release-notes.md
 
     - name: Encode release notes
       if: steps.release.outputs.new-release-published == 'true'
@@ -177,16 +177,16 @@ runs:
         if [ -f "$CHANGELOG_FILE" ]; then
           cp "$CHANGELOG_FILE" "${CHANGELOG_FILE}.bak"
           {
-            cat "$NOTES_FILE"
-            printf '\n\n'
+            printf '%s' "$NOTES"
+            printf '\n'
             cat "${CHANGELOG_FILE}.bak"
           } > "$CHANGELOG_FILE"
           rm -f "${CHANGELOG_FILE}.bak"
         else
-          cat "$NOTES_FILE" > "$CHANGELOG_FILE"
+          printf '%s\n' "$NOTES" > "$CHANGELOG_FILE"
         fi
       env:
-        NOTES_FILE: ${{ steps.notes.outputs.notes-file }}
+        NOTES: ${{ steps.release.outputs.new-release-notes }}
         CHANGELOG_FILE: ${{ inputs.changelog-file }}
 
     - name: Update version
