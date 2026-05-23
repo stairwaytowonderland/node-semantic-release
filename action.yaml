@@ -91,13 +91,24 @@ runs:
         node-version: ${{ inputs.node-version }}
         cache: npm
 
+    - name: Ensure .releaserc
+      if: inputs.build-only != 'true'
+      shell: bash
+      run: |
+        if [ ! -f "${GITHUB_WORKSPACE}/.releaserc" ] && [ ! -f "${GITHUB_WORKSPACE}/.releaserc.json" ] && [ ! -f "${GITHUB_WORKSPACE}/.releaserc.yaml" ] && [ ! -f "${GITHUB_WORKSPACE}/.releaserc.config.js" ]; then
+          echo "::warning::.releaserc not found. Copying default configuration."
+          echo "::notice::Used default .releaserc. Please add a .releaserc file to customize your release process."
+          cp "${GITHUB_ACTION_PATH}/templates/.releaserc" "${GITHUB_WORKSPACE}/"
+          npm install --package-lock-only
+        fi
+
     - name: Ensure package.json
       shell: bash
       run: |
-        if [ ! -f package.json ]; then
+        if [ ! -f "${GITHUB_WORKSPACE}/package.json" ]; then
           echo "::warning::package.json not found. Copying default configuration."
-          cp "${GITHUB_ACTION_PATH}/templates/package.json" ./package.json
-          npm install --package-lock-only
+          echo "::notice::Used default package.json. Please add a package.json file to customize your project."
+          cp "${GITHUB_ACTION_PATH}/templates/package.json" "${GITHUB_WORKSPACE}/"
         fi
 
     - name: Install dependencies
@@ -120,16 +131,6 @@ runs:
         if ! node -e "require('semantic-release-export-data')" 2>/dev/null; then
           echo "::error::semantic-release-export-data is not installed. Add it to package.json and ensure it is listed in your semantic-release plugins (e.g. '.releaserc')."
           exit 1
-        fi
-
-    - name: Ensure .releaserc
-      if: inputs.build-only != 'true'
-      shell: bash
-      run: |
-        if [ ! -f .releaserc ]; then
-          echo "::warning::.releaserc not found. Copying default configuration."
-          cp "${GITHUB_ACTION_PATH}/templates/"* "${GITHUB_WORKSPACE}/"
-          npm install --package-lock-only
         fi
 
     - name: Release
