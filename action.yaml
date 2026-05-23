@@ -177,8 +177,7 @@ runs:
         if [ -f "$CHANGELOG_FILE" ]; then
           cp "$CHANGELOG_FILE" "${CHANGELOG_FILE}.bak"
           {
-            printf '%s' "$NOTES"
-            printf '\n'
+            cat "$NOTES_FILE"
             cat "${CHANGELOG_FILE}.bak"
           } > "$CHANGELOG_FILE"
           rm -f "${CHANGELOG_FILE}.bak"
@@ -186,7 +185,7 @@ runs:
           printf '%s\n' "$NOTES" > "$CHANGELOG_FILE"
         fi
       env:
-        NOTES: ${{ steps.release.outputs.new-release-notes }}
+        NOTES_FILE: ${{ steps.notes.outputs.notes-file }}
         CHANGELOG_FILE: ${{ inputs.changelog-file }}
 
     - name: Update version

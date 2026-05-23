@@ -29,18 +29,6 @@ on:
 # 'Fine-grained token' repo permissions: Contents
 
 jobs:
-  debug:
-    name: Debug event info
-    runs-on: ubuntu-latest
-    steps:
-      - name: Print event info
-        run: |
-          printf "Event name: %s\n" "$GITHUB_EVENT_NAME"
-          printf "Head commit author name:\n%s\n" "$HEAD_COMMIT_AUTHOR_NAME"
-          printf "Head commit message:\n%s\n" "$HEAD_COMMIT_MESSAGE"
-        env:
-          HEAD_COMMIT_AUTHOR_NAME: ${{ github.event.head_commit.author.name }}
-          HEAD_COMMIT_MESSAGE: ${{ github.event.head_commit.message }}
   release:
     name: Release
     uses: ./.github/workflows/release.yaml
