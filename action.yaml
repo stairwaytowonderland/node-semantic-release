@@ -150,11 +150,10 @@ runs:
       run: |
         printf '%s' "$NOTES" | base64 -w 0 | xargs -I{} echo "notes-b64={}" >> "$GITHUB_OUTPUT"
         {
-          printf '%s' "$NOTES_B64" | base64 -d
+          printf '%s' "$NOTES" | base64 -d
           printf '\n'
         } > "$NOTES_FILE"
         echo "notes-file=$NOTES_FILE" >> "$GITHUB_OUTPUT"
-        printf '::notice Release Notes::%s\n' "$NOTES"
       # The release notes from steps.release.outputs.new-release-notes
       # can contain arbitrary Markdown — newlines, special characters,
       # quotes — that would break if interpolated directly into the run
