@@ -210,7 +210,6 @@ runs:
         COMMIT_EMAIL: ${{ inputs.commit-email || format('{0}@{1}', github.actor, 'users.noreply.github.com') }}
         NOTES_FILE: ${{ steps.notes.outputs.notes-file }}
         EXCLUDE_FILE: ${{ github.workspace }}/.gitignore_global
-      #   GITHUB_TOKEN: ${{ inputs.github-token || github.token }}
 
     - name: Prepare commit assets
       if: steps.release.outputs.new-release-published == 'true' && inputs.manual-tag == 'true'
@@ -239,8 +238,8 @@ runs:
           echo "No changes to commit."
         else
           COMMIT_MESSAGE="${COMMIT_PREFIX}${VERSION}"
-          if [ -f "$NOTES_FILE" ]; then
-            notes=$(cat "$NOTES_FILE" 2> /dev/null || true)
+          if [ -n "$NOTES" ]; then
+            notes="$NOTES"
             COMMIT_MESSAGE="$(cat <<EOF
         $COMMIT_MESSAGE
 
@@ -254,12 +253,11 @@ runs:
         fi
       env:
         VERSION: ${{ steps.release.outputs.new-release-version }}
-        NOTES_FILE: ${{ steps.notes.outputs.notes-file }}
+        NOTES: ${{ steps.release.outputs.new-release-notes }}
         ASSETS: ${{ steps.prepare-assets.outputs.assets }}
         COMMIT_PREFIX: ${{ inputs.commit-prefix }}
 
     - name: Create tag
-      # if: steps.commit-assets.outputs.commit_sha != ''
       if: steps.release.outputs.new-release-published == 'true' && inputs.manual-tag == 'true'
       shell: bash
       run: |
@@ -281,7 +279,7 @@ runs:
         else
           echo "::notice::🚀 Release triggered successfully!"
         fi
-        if [ -f "$NOTES_FILE" ]; then
+        if [ -n "$NOTES" ]; then
           echo "> [!TIP]" >> $GITHUB_STEP_SUMMARY
           echo "> ### Release Information" >> $GITHUB_STEP_SUMMARY
           echo "> ✅ **Version**: ${VERSION}" >> $GITHUB_STEP_SUMMARY
@@ -292,13 +290,13 @@ runs:
           printf ">   > \n" >> $GITHUB_STEP_SUMMARY
           while IFS= read -r line; do
             printf '%s\n' "$line" | sed 's/^/>\ /' | tee -a $GITHUB_STEP_SUMMARY
-          done < "$NOTES_FILE"
+          done < <(printf '%s\n' "$NOTES")
           echo "::endgroup::"
         fi
       env:
         TAG: ${{ steps.release.outputs.new-release-git-tag }}
         VERSION: ${{ steps.release.outputs.new-release-version }}
-        NOTES_FILE: ${{ steps.notes.outputs.notes-file }}
+        NOTES: ${{ steps.release.outputs.new-release-notes }}
         MANUAL_TAG: ${{ inputs.manual-tag }}
         DRY_RUN: ${{ inputs.dry-run }}
 
