@@ -16,7 +16,7 @@ on:
         required: false
 
 concurrency:
-  group: '${{ github.repository_id }}-${{ github.ref }}'
+  group: '${{ github.repository_id }}-${{ github.workflow }}-${{ github.ref_name }}'
   cancel-in-progress: false
 
 jobs:
