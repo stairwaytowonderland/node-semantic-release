@@ -1,6 +1,7 @@
 {
 	"name": "node-semantic-release",
 	"version": "1.117.0",
+	"description": "A semantic-release plugin to automate releases from a repository root.",
 	"scripts": {
 		"build": "echo 'Nothing to build'"
 	},
@@ -8,9 +9,7 @@
 		"@semantic-release/changelog": "^6.0.3",
 		"@semantic-release/commit-analyzer": "^13.0.1",
 		"@semantic-release/git": "^10.0.1",
-		"@semantic-release/npm": "^13.1.5",
 		"@semantic-release/release-notes-generator": "^14.1.0",
-		"@semantic-release/exec": "7.1.0",
 		"conventional-changelog-conventionalcommits": "^9.3.1",
 		"semantic-release": "^25.0.3",
 		"semantic-release-export-data": "^1.2.0"
