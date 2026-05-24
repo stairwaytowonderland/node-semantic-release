@@ -16,8 +16,8 @@ on:
         required: false
 
 concurrency:
-  group: '${{ github.repository_id }}-publish-${{ github.ref_name }}'
-  cancel-in-progress: true
+  group: '${{ github.repository_id }}-${{ github.ref_name }}'
+  cancel-in-progress: false
 
 jobs:
   publish:
