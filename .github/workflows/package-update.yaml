@@ -9,7 +9,7 @@ on:
 
 concurrency:
   group: '${{ github.repository_id }}-${{ github.ref_name }}'
-  cancel-in-progress: false
+  cancel-in-progress: true
 
 # Use PAT instead of GITHUB_TOKEN to cause semantic-release to trigger tag pipeline when tag is created.
 # 'Fine-grained token' repo permissions: Contents
