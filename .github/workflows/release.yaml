@@ -32,7 +32,7 @@ on:
         required: false
 
 concurrency:
-  group: '${{ github.repository_id }}-release-${{ github.ref_name }}'
+  group: '${{ github.repository_id }}-release-${{ github.ref }}'
   cancel-in-progress: true
 
 jobs:
