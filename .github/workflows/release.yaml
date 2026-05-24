@@ -1,9 +1,6 @@
 name: Release
 
 on:
-  # push:
-  #   branches: [main]
-  # workflow_dispatch:
   workflow_call:
     inputs:
       dispatch-workflow:
@@ -30,10 +27,6 @@ on:
       github-token:
         description: 'GitHub Personal Access Token with repo scope for creating releases.'
         required: false
-
-concurrency:
-  group: '${{ github.repository_id }}-${{ github.ref }}'
-  cancel-in-progress: true
 
 jobs:
   release:
