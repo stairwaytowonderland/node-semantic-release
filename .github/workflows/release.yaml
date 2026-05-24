@@ -61,7 +61,6 @@ jobs:
           fetch-depth: 0
           token: ${{ secrets.github-token || secrets.GITHUB_TOKEN }}
           # ref: ${{ github.sha }}
-          # persist-credentials: false
 
       - name: Set vars
         id: vars
@@ -77,7 +76,6 @@ jobs:
           github-token: ${{ secrets.github-token || secrets.GITHUB_TOKEN }}
           changelog-file: ${{ inputs.changelog-file }}
           additional-assets-json: ${{ inputs.additional-assets-json }}
-          # ref: ${{ github.sha }}
 
       - name: Release failed
         if: steps.release.outputs.new-release-published != 'true' && inputs.fail-on-no-release
