@@ -43,30 +43,10 @@ jobs:
           ref: ${{ steps.vars.outputs.tag }}
           fetch-depth: 0
 
-      - name: Create release
+      - name: Publish release
         uses: ./
         with:
-          github-token: ${{ secrets.GITHUB_TOKEN }}
           publish: true
-          # notes-b64: ${{ inputs.notes-b64 || '' }}
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          notes-b64: ${{ inputs.notes-b64 || '' }}
           tag: ${{ steps.vars.outputs.tag }}
-
-      # - name: Decode release notes
-      #   if: ${{ inputs.notes-b64 != '' }}
-      #   run: printf '%s' "$NOTES_B64" | base64 -d > release-notes.md
-      #   env:
-      #     NOTES_B64: ${{ inputs.notes-b64 }}
-
-      # - name: Create release
-      #   run: |
-      #     if [ -f release-notes.md ]; then
-      #       gh release create "${{ steps.vars.outputs.tag }}" \
-      #         --title "${{ steps.vars.outputs.tag }}" \
-      #         --notes-file release-notes.md
-      #     else
-      #       gh release create "${{ steps.vars.outputs.tag }}" \
-      #         --title "${{ steps.vars.outputs.tag }}" \
-      #         --notes-from-tag
-      #     fi
-      #   env:
-      #     GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
