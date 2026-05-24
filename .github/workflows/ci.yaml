@@ -38,7 +38,7 @@ jobs:
     uses: ./.github/workflows/release.yaml
     with:
       # dispatch-workflow: publish.yaml
-      fail-on-no-release: ${{ inputs.fail-on-no-release }}
+      fail-on-no-release: ${{ inputs.fail-on-no-release || false }}
       changelog-file: ${{ inputs.changelog-file || 'CHANGELOG.md' }}
       additional-assets-json: ${{ inputs.additional-assets-json || '["package.json","package-lock.json"]' }}
     secrets:
