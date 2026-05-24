@@ -47,6 +47,7 @@ jobs:
         uses: ./
         with:
           github-token: ${{ secrets.GITHUB_TOKEN }}
+          publish: true
           # notes-b64: ${{ inputs.notes-b64 || '' }}
           tag: ${{ steps.vars.outputs.tag }}
 
