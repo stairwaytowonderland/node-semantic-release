@@ -56,8 +56,12 @@ inputs:
     description: Dispatch the publish workflow after a successful release.
     required: false
     default: ''
-  ref:
-    description: The git ref to checkout for the release, or for publish.
+  notes-b64:
+    description: Base64-encoded release notes to pass to the publish workflow.
+    required: false
+    default: ''
+  tag:
+    description: The git tag or ref to use for publish.
     required: false
     default: ${{ github.ref }}
 
@@ -86,13 +90,14 @@ runs:
   using: composite
   steps:
     - name: Setup Node.js
+      if: inputs.publish != 'true'
       uses: actions/setup-node@v6
       with:
         node-version: ${{ inputs.node-version }}
         cache: npm
 
     - name: Ensure .releaserc
-      if: inputs.build-only != 'true'
+      if: inputs.publish != 'true'
       shell: bash
       run: |
         if [ ! -f "${GITHUB_WORKSPACE}/.releaserc" ] && [ ! -f "${GITHUB_WORKSPACE}/.releaserc.json" ] && [ ! -f "${GITHUB_WORKSPACE}/.releaserc.yaml" ] && [ ! -f "${GITHUB_WORKSPACE}/.releaserc.config.js" ]; then
@@ -103,6 +108,7 @@ runs:
         fi
 
     - name: Ensure package.json
+      if: inputs.publish != 'true'
       shell: bash
       run: |
         if [ ! -f "${GITHUB_WORKSPACE}/package.json" ]; then
@@ -112,20 +118,22 @@ runs:
         fi
 
     - name: Install dependencies
+      if: inputs.publish != 'true'
       shell: bash
       run: npm ci
 
     - name: Build
+      if: inputs.publish != 'true'
       shell: bash
       run: npm run build
 
     - name: Type check
-      if: inputs.typecheck == 'true'
+      if: inputs.publish != 'true' && inputs.typecheck == 'true'
       shell: bash
       run: npm run typecheck
 
     - name: Check 'semantic-release-export-data' plugin
-      if: inputs.build-only != 'true'
+      if: inputs.publish != 'true' && inputs.build-only != 'true'
       shell: bash
       run: |
         if ! node -e "require('semantic-release-export-data')" 2>/dev/null; then
@@ -134,7 +142,7 @@ runs:
         fi
 
     - name: Release
-      if: inputs.build-only != 'true'
+      if: inputs.publish != 'true' && inputs.build-only != 'true'
       id: release
       shell: bash
       run: npx semantic-release ${DRY_RUN_FLAG}
@@ -304,6 +312,73 @@ runs:
         NOTES: ${{ steps.release.outputs.new-release-notes }}
         MANUAL_TAG: ${{ inputs.manual-tag }}
         DRY_RUN: ${{ inputs.dry-run }}
+
+    - name: Verify tag
+      if: inputs.publish == 'true'
+      id: verify
+      shell: bash
+      run: |
+        TAG_SHA=$(git rev-parse --verify "$TAG")
+        echo "sha=$TAG_SHA" >> "$GITHUB_OUTPUT"
+        echo "tag=$TAG" >> "$GITHUB_OUTPUT"
+      env:
+        TAG: ${{ inputs.tag }}
+
+    - name: Get release notes from tag
+      if: inputs.publish == 'true' && inputs.notes-b64 == ''
+      id: parse
+      shell: bash
+      run: git tag -l --format='%(contents)' "$TAG" > release-notes.md
+      env:
+        TAG: ${{ steps.verify.outputs.tag }}
+
+    - name: Decode release notes
+      if: inputs.publish == 'true' && inputs.notes-b64 != ''
+      id: decode
+      shell: bash
+      run: printf '%s' "$NOTES_B64" | base64 -d > release-notes.md
+      env:
+        NOTES_B64: ${{ inputs.notes-b64 }}
+
+    - name: Create release
+      if: inputs.publish == 'true'
+      id: publish
+      shell: bash
+      run: |
+        if [ -f release-notes.md ]; then
+          RELEASE_URL=$(gh release create "${{ steps.verify.outputs.tag }}" \
+            --title "${{ steps.verify.outputs.tag }}" \
+            --notes-file release-notes.md)
+        else
+          RELEASE_URL=$(gh release create "${{ steps.verify.outputs.tag }}" \
+            --title "${{ steps.verify.outputs.tag }}" \
+            --notes-from-tag)
+        fi
+        echo "release_url=$RELEASE_URL" >> "$GITHUB_OUTPUT"
+      env:
+        GH_TOKEN: ${{ inputs.github-token }}
+
+    - name: Show publish information
+      if: inputs.publish == 'true'
+      shell: bash
+      run: |
+        echo "::notice::🚀 Release '${TAG}' created successfully! View it at $RELEASE_URL"
+        if [ -f release-notes.md ]; then
+          echo "> [!TIP]" >> $GITHUB_STEP_SUMMARY
+          echo "> ### Release Information" >> $GITHUB_STEP_SUMMARY
+          echo "> 🏷️ **Git tag**: ${TAG}" >> $GITHUB_STEP_SUMMARY
+          echo "> 🔗 **Release URL**: ${RELEASE_URL}" >> $GITHUB_STEP_SUMMARY
+          echo "> 📝 **Release Notes**:" >> $GITHUB_STEP_SUMMARY
+          echo "> " >> $GITHUB_STEP_SUMMARY
+          echo "::group::📝 Release Notes"
+          while IFS= read -r line; do
+            printf '%s\n' "$line" | sed 's/^/>\ /' | tee -a $GITHUB_STEP_SUMMARY
+          done < release-notes.md
+          echo "::endgroup::"
+        fi
+      env:
+        TAG: ${{ steps.verify.outputs.tag }}
+        RELEASE_URL: ${{ steps.publish.outputs.release_url }}
 
 branding:
   icon: tag
