@@ -5,8 +5,10 @@ and base64-encodes the release notes for safe downstream transport.
 
 The action operates in two distinct modes controlled by the `publish` input:
 
-- **Release mode** (default): Sets up Node.js, installs dependencies, builds the project, runs semantic-release, and optionally commits release assets and creates a git tag.
-- **Publish mode** (`publish: true`): Skips all build steps and creates a GitHub Release from an existing tag, optionally using base64-encoded release notes passed from a prior release step.
+- **Release mode** (default): Sets up Node.js, installs dependencies, builds the project, runs semantic-release, and
+optionally commits release assets and creates a git tag.
+- **Publish mode** (`publish: true`): Skips all build steps and creates a GitHub Release from an existing tag, optionally
+using base64-encoded release notes passed from a prior release step.
 
 ## Usage
 
@@ -34,7 +36,8 @@ To work around this, choose one of the following approaches:
 
 2. **Use `secrets.GITHUB_TOKEN` + `workflow_dispatch` for publish.** Run semantic-release on push to
    `main`, then dispatch a separate publish workflow from the same job using the
-   `new-release-notes-base64` output. See the [workflow_dispatch example](#using-secretsgithub_token-with-workflow_dispatch-publish) below.
+   `new-release-notes-base64` output. See the [workflow_dispatch example](#using-secretsgithub_token-with-workflow_dispatch-publish)
+   below.
 
 3. **Use `secrets.GITHUB_TOKEN` + the `@semantic-release/github` plugin.** Configure
    `@semantic-release/github` in your `.releaserc` and semantic-release will create the GitHub Release
