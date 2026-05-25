@@ -83,9 +83,7 @@ The publish job only needs `contents: write`.
 > [!NOTE]
 > **`manual-tag` mode** runs semantic-release in dry-run to determine the next version and generate release
 > notes, then manually commits the specified assets (`changelog-file`, `additional-assets-json`) and pushes
-> an annotated git tag. This is useful when you must use `secrets.GITHUB_TOKEN` and rely on a
-> `workflow_dispatch`-triggered publish step — since a manually pushed tag does not itself trigger workflows
-> when created by `GITHUB_TOKEN`, you dispatch the publish separately from the same job.
+> an annotated git tag. This is useful for debugging.
 
 ### Publish mode inputs
 
