@@ -87,9 +87,9 @@ outputs:
   release-sha:
     description: Git SHA of the release tag that was published.
     value: ${{ steps.verify.outputs.sha }}
-  release-notes:
-    description: Release notes (Markdown) of the release that was published.
-    value: ${{ steps.publish.outputs.notes }}
+  release-notes-b64:
+    description: Base64-encoded release notes of the release that was published.
+    value: ${{ steps.publish.outputs.release-notes-b64 }}
   release-published:
     description: "'true' if the release was published."
     value: ${{ steps.publish.outputs.published }}
@@ -357,7 +357,8 @@ runs:
           RELEASE_URL=$(gh release create "${{ steps.verify.outputs.tag }}" \
             --title "${{ steps.verify.outputs.tag }}" \
             --notes-file release-notes.md)
-            echo "notes=$(cat release-notes.md)" >> "$GITHUB_OUTPUT"
+            notes="$(cat release-notes.md)"
+            printf '%s' "$notes" | base64 -w 0 | xargs -I{} echo "notes-b64={}" >> "$GITHUB_OUTPUT"
         else
           RELEASE_URL=$(gh release create "${{ steps.verify.outputs.tag }}" \
             --title "${{ steps.verify.outputs.tag }}" \
@@ -385,6 +386,7 @@ runs:
             printf '%s\n' "$line" | sed 's/^/>\ /' | tee -a $GITHUB_STEP_SUMMARY
           done < release-notes.md
           echo "::endgroup::"
+          rm -f release-notes.md
         fi
       env:
         TAG: ${{ steps.verify.outputs.tag }}

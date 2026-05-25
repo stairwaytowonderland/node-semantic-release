@@ -28,7 +28,7 @@ jobs:
       release-url: ${{ steps.publish.outputs.release-url }}
       release-tag: ${{ steps.publish.outputs.release-tag }}
       release-sha: ${{ steps.publish.outputs.release-sha }}
-      release-notes: ${{ steps.publish.outputs.release-notes }}
+      release-notes-b64: ${{ steps.publish.outputs.release-notes-b64 }}
       release-published: ${{ steps.publish.outputs.release-published }}
 
     steps:
