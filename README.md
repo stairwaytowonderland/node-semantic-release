@@ -7,8 +7,8 @@ The action operates in two distinct modes controlled by the `publish` input:
 
 - **Release mode** (default): Sets up Node.js, installs dependencies, builds the project, runs semantic-release, and
 optionally commits release assets and creates a git tag.
-- **Publish mode** (`publish: true`): Skips all build steps and creates a GitHub Release from an existing tag, optionally
-using base64-encoded release notes passed from a prior release step.
+- **Publish mode** (`publish: true`): Skips all build and tag creation steps, and creates a GitHub Release from an existing
+tag, using either base64-encoded release notes or release notes determine from the tag.
 
 ## Usage
 
