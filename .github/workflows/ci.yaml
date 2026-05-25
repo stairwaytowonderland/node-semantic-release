@@ -2,6 +2,7 @@ name: CI
 
 on:
   push:
+    # Fires when a tag matching v* is pushed with personal credentials.
     tags: ['v*']
     branches: [main]
     paths-ignore:
