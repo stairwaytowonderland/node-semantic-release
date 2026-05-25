@@ -24,6 +24,13 @@ jobs:
     permissions:
       contents: write
 
+    outputs:
+      release-url: ${{ steps.publish.outputs.release-url }}
+      release-tag: ${{ steps.publish.outputs.release-tag }}
+      release-sha: ${{ steps.publish.outputs.release-sha }}
+      release-notes: ${{ steps.publish.outputs.release-notes }}
+      release-published: ${{ steps.publish.outputs.release-published }}
+
     steps:
       # Resolve the tag from whichever trigger fired:
       #   push: tags                        → github.ref_name  (e.g. v1.2.3)
@@ -41,16 +48,9 @@ jobs:
           token: ${{ secrets.github-token || secrets.GITHUB_TOKEN }}
           fetch-depth: 0
 
-      - name: Checkout publish workflow
-        uses: actions/checkout@v6
-        with:
-          repository: ${{ github.action_repository}}
-          ref: ${{ github.action_ref }}
-          token: ${{ secrets.github-token || secrets.GITHUB_TOKEN }}
-          path: ./.node-semantic-release
-
       - name: Publish release
-        uses: ./.node-semantic-release
+        id: publish
+        uses: ./
         with:
           publish: true
           github-token: ${{ secrets.github-token || secrets.GITHUB_TOKEN }}

@@ -75,15 +75,24 @@ outputs:
   new-release-notes:
     description: Release notes (Markdown) of the new release.
     value: ${{ steps.release.outputs.new-release-notes }}
-  new-release-notes-file:
-    description: File path to the release notes (Markdown) of the new release.
-    value: ${{ steps.notes.outputs.notes-file }}
   new-release-notes-base64:
     description: Base64-encoded release notes.
     value: ${{ steps.encode.outputs.notes-b64 }}
-  new-release-url:
+  release-url:
     description: URL of the new release on GitHub.
-    value: ${{ steps.publish.outputs.release_url }}
+    value: ${{ steps.publish.outputs.release-url }}
+  release-tag:
+    description: Git tag of the release that was published (e.g. v1.2.3).
+    value: ${{ steps.verify.outputs.tag }}
+  release-sha:
+    description: Git SHA of the release tag that was published.
+    value: ${{ steps.verify.outputs.sha }}
+  release-notes:
+    description: Release notes (Markdown) of the release that was published.
+    value: ${{ steps.publish.outputs.notes }}
+  release-published:
+    description: "'true' if the release was published."
+    value: ${{ steps.publish.outputs.published }}
 
 runs:
   using: composite
@@ -348,12 +357,14 @@ runs:
           RELEASE_URL=$(gh release create "${{ steps.verify.outputs.tag }}" \
             --title "${{ steps.verify.outputs.tag }}" \
             --notes-file release-notes.md)
+            echo "notes=$(cat release-notes.md)" >> "$GITHUB_OUTPUT"
         else
           RELEASE_URL=$(gh release create "${{ steps.verify.outputs.tag }}" \
             --title "${{ steps.verify.outputs.tag }}" \
             --notes-from-tag)
         fi
-        echo "release_url=$RELEASE_URL" >> "$GITHUB_OUTPUT"
+        echo "release-url=$RELEASE_URL" >> "$GITHUB_OUTPUT"
+        echo "published=true" >> "$GITHUB_OUTPUT"
       env:
         GH_TOKEN: ${{ inputs.github-token }}
 
@@ -377,7 +388,7 @@ runs:
         fi
       env:
         TAG: ${{ steps.verify.outputs.tag }}
-        RELEASE_URL: ${{ steps.publish.outputs.release_url }}
+        RELEASE_URL: ${{ steps.publish.outputs.release-url }}
 
 branding:
   icon: tag

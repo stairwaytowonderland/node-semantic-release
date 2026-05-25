@@ -41,7 +41,6 @@ jobs:
       new-release-version: ${{ steps.release.outputs.new-release-version }}
       new-release-git-tag: ${{ steps.release.outputs.new-release-git-tag }}
       new-release-notes: ${{ steps.release.outputs.new-release-notes }}
-      new-release-notes-file: ${{ steps.release.outputs.new-release-notes-file }}
       new-release-notes-base64: ${{ steps.release.outputs.new-release-notes-base64 }}
 
     steps:
@@ -59,17 +58,9 @@ jobs:
           token: ${{ secrets.github-token || secrets.GITHUB_TOKEN }}
           # ref: ${{ github.sha }}
 
-      - name: Checkout release workflow
-        uses: actions/checkout@v6
-        with:
-          repository: ${{ github.action_repository}}
-          ref: ${{ github.action_ref }}
-          token: ${{ secrets.github-token || secrets.GITHUB_TOKEN }}
-          path: ./.node-semantic-release
-
       - name: Semantic release
         id: release
-        uses: ./.node-semantic-release
+        uses: ./
         with:
           github-token: ${{ secrets.github-token || secrets.GITHUB_TOKEN }}
           changelog-file: ${{ inputs.changelog-file }}
