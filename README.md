@@ -73,9 +73,9 @@ The publish job only needs `contents: write`.
 | `manual-tag`             | Compute the next version with semantic-release (dry-run), then commit release assets and push the tag manually. See note below. | No       | —                                   |
 | `changelog-file`         | Path to the changelog file to commit when using `manual-tag` mode (e.g. `CHANGELOG.md`).                                        | No       | —                                   |
 | `additional-assets-json` | JSON array of additional files to commit when using `manual-tag` mode (e.g. `'["package.json","package-lock.json"]'`).          | No       | —                                   |
-| `commit-author`          | Git author name for commits made by the action.                                                                                 | No       | `semantic-release-bot`              |
-| `commit-email`           | Git author email for commits made by the action.                                                                                | No       | `semantic-release-bot@martynus.net` |
-| `commit-prefix`          | Prefix for the release commit message.                                                                                          | No       | `chore(release):`                   |
+| `commit-author`          | Git author name for commits made by the action when using `manual-tag` mode.                                                    | No       | `semantic-release-bot`              |
+| `commit-email`           | Git author email for commits made by the action when using `manual-tag` mode.                                                   | No       | `semantic-release-bot@martynus.net` |
+| `commit-prefix`          | Prefix for the release commit message when using `manual-tag` mode.                                                             | No       | `chore(release):`                   |
 
 > [!NOTE]
 > ¹ `github-token` is technically optional but is **required** whenever `build-only` is not `true`.
