@@ -160,7 +160,7 @@ runs:
         echo "notes-file=${NOTES_FILE}" >> "$GITHUB_OUTPUT"
       env:
         NOTES: ${{ steps.release.outputs.new-release-notes }}
-        NOTES_FILE: ${{ github.workspace }}/.release-notes.md
+        NOTES_FILE: ./.release-notes.md
 
     - name: Encode release notes
       if: steps.release.outputs.new-release-published == 'true'
@@ -221,7 +221,7 @@ runs:
         COMMIT_AUTHOR: ${{ inputs.commit-author || github.actor }}
         COMMIT_EMAIL: ${{ inputs.commit-email || format('{0}@{1}', github.actor, 'users.noreply.github.com') }}
         NOTES_FILE: ${{ steps.notes.outputs.notes-file }}
-        EXCLUDE_FILE: ${{ github.workspace }}/.gitignore_global
+        EXCLUDE_FILE: ./.gitignore_global
 
     - name: Prepare commit assets
       if: steps.release.outputs.new-release-published == 'true' && inputs.manual-tag == 'true'

@@ -45,13 +45,6 @@ jobs:
       new-release-notes-base64: ${{ steps.release.outputs.new-release-notes-base64 }}
 
     steps:
-      - name: Checkout
-        uses: actions/checkout@v6
-        with:
-          fetch-depth: 0
-          token: ${{ secrets.github-token || secrets.GITHUB_TOKEN }}
-          # ref: ${{ github.sha }}
-
       - name: Set vars
         id: vars
         run: |
@@ -59,9 +52,24 @@ jobs:
         env:
           IS_DISPATCH_WORKFLOW: ${{ secrets.github-token != secrets.GITHUB_TOKEN && inputs.dispatch-workflow != '' }}
 
+      - name: Checkout
+        uses: actions/checkout@v6
+        with:
+          fetch-depth: 0
+          token: ${{ secrets.github-token || secrets.GITHUB_TOKEN }}
+          # ref: ${{ github.sha }}
+
+      - name: Checkout release workflow
+        uses: actions/checkout@v6
+        with:
+          repository: ${{ github.action_repository}}
+          ref: ${{ github.action_ref }}
+          token: ${{ secrets.github-token || secrets.GITHUB_TOKEN }}
+          path: ./.node-semantic-release
+
       - name: Semantic release
         id: release
-        uses: ./
+        uses: ./.node-semantic-release
         with:
           github-token: ${{ secrets.github-token || secrets.GITHUB_TOKEN }}
           changelog-file: ${{ inputs.changelog-file }}
