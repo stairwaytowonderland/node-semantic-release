@@ -81,6 +81,9 @@ outputs:
   new-release-notes-base64:
     description: Base64-encoded release notes.
     value: ${{ steps.encode.outputs.notes-b64 }}
+  new-release-url:
+    description: URL of the new release on GitHub.
+    value: ${{ steps.publish.outputs.release_url }}
 
 runs:
   using: composite

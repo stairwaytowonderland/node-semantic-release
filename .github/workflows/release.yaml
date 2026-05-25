@@ -7,7 +7,6 @@ on:
         description: 'The workflow file to dispatch after a successful release.'
         type: string
         required: false
-        default: ''
       fail-on-no-release:
         description: 'Fail the workflow if no release is published (e.g. if there are no relevant commits).'
         type: boolean
@@ -17,12 +16,10 @@ on:
         description: 'Path to the generated changelog file to commit when using manual-tag mode.'
         type: string
         required: false
-        default: ''
       additional-assets-json:
         description: 'Additional files to commit when using manual-tag mode (e.g. package.json).'
         type: string
         required: false
-        default: ''
     secrets:
       github-token:
         description: 'GitHub Personal Access Token with repo scope for creating releases.'

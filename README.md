@@ -6,9 +6,11 @@ and base64-encodes the release notes for safe downstream transport.
 ## Usage
 
 ```yaml
+# Use PAT instead of GITHUB_TOKEN to cause semantic-release to trigger tag pipeline when tag is created.
+# 'Fine-grained token' repo permissions: Contents
 - uses: stairwaytowonderland/node-semantic-release@v1
   with:
-    github-token: ${{ secrets.GITHUB_TOKEN }}
+    github-token: <PAT>
 ```
 
 ## Inputs
@@ -37,7 +39,8 @@ and base64-encodes the release notes for safe downstream transport.
 ## Prerequisites
 
 Your repository must have the [`semantic-release-export-data`](https://github.com/felipecrs/semantic-release-export-data)
-plugin installed and configured. The action checks for it at runtime and fails with a descriptive error if it is missing.
+plugin installed and configured at the begging of the releaserc plugins list. The action checks for it at runtime and
+fails with a descriptive error if it is missing.
 
 **`package.json`**
 
@@ -45,7 +48,13 @@ plugin installed and configured. The action checks for it at runtime and fails w
 {
   "devDependencies": {
     "semantic-release": "...",
-    "semantic-release-export-data": "..."
+    "semantic-release-export-data": "...",
+    "conventional-changelog-conventionalcommits": "...",
+    "@semantic-release/changelog": "...",
+    "@semantic-release/commit-analyzer": "...",
+    "@semantic-release/git": "...",
+    "@semantic-release/npm": "...",
+    "@semantic-release/release-notes-generator": "...",
   }
 }
 ```
@@ -55,9 +64,12 @@ plugin installed and configured. The action checks for it at runtime and fails w
 ```json
 {
   "plugins": [
+    "semantic-release-export-data",
+    "@semantic-release/changelog",
     "@semantic-release/commit-analyzer",
     "@semantic-release/release-notes-generator",
-    "semantic-release-export-data"
+    "@semantic-release/npm",
+    "@semantic-release/git"
   ]
 }
 ```
@@ -137,36 +149,3 @@ and special characters — through `workflow_dispatch` inputs or other steps wit
         }
       })
 ```
-
-## What the action does
-
-```mermaid
-flowchart TD
-    A([Start]) --> B[Setup Node.js<br>actions/setup-node]
-    B --> C[Install dependencies<br>npm ci]
-    C --> D[Build<br>npm run build]
-    D --> E{typecheck<br>== 'true'?}
-    E -- "&nbsp;Yes&nbsp;" --> F[npm run typecheck]
-    F --> Z([Done ✓])
-    E -- "&nbsp;No&nbsp;" --> G{build-only<br>== 'true'?}
-    G -- "&nbsp;Yes&nbsp;" --> Z
-    G -- "&nbsp;No&nbsp;" --> H{github-token<br>provided?}
-    H -- "&nbsp;No&nbsp;" --> ERR1([Error: token required])
-    H -- "&nbsp;Yes&nbsp;" --> I{semantic-release-<br>export-data installed?}
-    I -- "&nbsp;No&nbsp;" --> ERR2([Error: plugin missing])
-    I -- "&nbsp;Yes&nbsp;" --> J[npx semantic-release]
-    J --> K{New release<br>published?}
-    K -- "&nbsp;No&nbsp;" --> Z
-    K -- "&nbsp;Yes&nbsp;" --> L[Base64-encode<br>release notes]
-    L --> M[Set outputs<br>new-release-*]
-    M --> Z
-```
-
-1. **Sets up Node.js** using [`actions/setup-node`](https://github.com/actions/setup-node) with npm caching.
-2. **Installs dependencies** with `npm ci`.
-3. **Builds the project** with `npm run build`.
-4. **Test** with `npm run typecheck` *(If `typecheck: 'true'`)*.
-5. **Validates** that `github-token` is provided and that `semantic-release-export-data` is installed
-*(if `build-only: false`)*.
-6. **Create release** with `npx semantic-release` *(if `build-only: false`)*.
-7. **Base64-encodes** the release notes and sets the `new-release-notes-base64` output *(if `build-only: false`)*.

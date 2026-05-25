@@ -2,17 +2,33 @@ name: Publish
 
 on:
   # Fires when a tag matching v* is pushed with personal credentials.
-  push:
-    tags:
-      - 'v*'
+  # push:
+  #   tags:
+  #     - 'v*'
 
   workflow_dispatch:
     inputs:
       tag:
         description: 'Tag to release (e.g. v1.2.3)'
+        type: string
         required: true
       notes-b64:
         description: 'Base64-encoded release notes (Markdown)'
+        type: string
+        required: false
+  workflow_call:
+    inputs:
+      tag:
+        description: 'Tag to release (e.g. v1.2.3)'
+        type: string
+        required: true
+      notes-b64:
+        description: 'Base64-encoded release notes (Markdown)'
+        type: string
+        required: false
+    secrets:
+      github-token:
+        description: 'GitHub Personal Access Token with repo scope for creating releases.'
         required: false
 
 concurrency:
