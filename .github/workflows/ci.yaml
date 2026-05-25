@@ -42,7 +42,7 @@ concurrency:
 jobs:
   release:
     name: Release
-    if: startsWith(github.ref, 'refs/heads/main') || ! inputs.publish
+    if: startsWith(github.ref, 'refs/heads/main') && ! inputs.publish
     uses: ./.github/workflows/release.yaml
     with:
       # dispatch-workflow: publish.yaml
