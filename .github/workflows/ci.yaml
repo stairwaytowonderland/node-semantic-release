@@ -41,7 +41,7 @@ concurrency:
 jobs:
   release:
     name: Release
-    if: (github.event_name == 'push' && startsWith(github.ref, 'refs/tags/v')) || github.event_name == 'workflow_dispatch'
+    if: startsWith(github.ref, 'refs/heads/main') || ! inputs.publish
     uses: ./.github/workflows/release.yaml
     with:
       # dispatch-workflow: publish.yaml
@@ -53,7 +53,7 @@ jobs:
 
   publish:
     name: Publish
-    if: inputs.publish == 'true'
+    if: startsWith(github.ref, 'refs/tags/v') || inputs.publish
     uses: ./.github/workflows/publish.yaml
     with:
       tag: ${{ github.ref_name }}
