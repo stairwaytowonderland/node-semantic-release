@@ -30,7 +30,7 @@ on:
         description: 'Whether to run the publish workflow after a successful release.'
         type: boolean
         required: false
-        default: true
+        default: false
 
 concurrency:
   group: '${{ github.repository_id }}-${{ github.ref_name }}'
