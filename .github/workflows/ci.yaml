@@ -17,7 +17,7 @@ on:
         required: false
         default: true
       publish:
-        description: 'Whether to run the publish workflow after a successful release.'
+        description: 'Whether to run in publish mode.'
         type: boolean
         required: false
         default: false

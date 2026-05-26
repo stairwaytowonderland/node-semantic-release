@@ -270,7 +270,7 @@ runs:
             )"
           fi
           git commit -m "$COMMIT_MESSAGE"
-          git push origin "HEAD:${GITHUB_REF_NAME}"
+          git push origin "HEAD:${GITHUB_REF}"
           echo "commit_sha=$(git rev-parse HEAD)" >> "$GITHUB_OUTPUT"
         fi
       env:
