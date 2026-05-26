@@ -4,6 +4,33 @@ description: >
   release notes for safe transport.
 author: stairwaytowonderland
 inputs:
+  github-token:
+    description: GitHub token passed to semantic-release (requires repo + write access).
+    required: false
+  node-version:
+    description: Node.js version to use.
+    required: false
+    default: '24'
+  build-only:
+    description: Run the build step but skip the release step (for testing).
+    required: false
+  dry-run:
+    description: Run semantic-release in dry-run mode (for testing).
+    required: false
+  typecheck:
+    description: Run typechecking but skip the release step (for testing).
+    required: false
+  changelog-file:
+    description: Path to the generated changelog file to commit when using manual-tag mode.
+    required: false
+    default: 'CHANGELOG.md'
+  additional-assets-json:
+    description: 'Additional files to commit when using manual-tag mode (e.g. package.json).'
+    required: false
+    default: '["package.json","package-lock.json"]'
+  manual-tag:
+    description: Manually create the release tag instead of letting semantic-release do it (for testing).
+    required: false
   commit-author:
     description: >
       Git author for commits made by semantic-release when creating a release
@@ -24,32 +51,6 @@ inputs:
       (e.g. "chore(release):").
     required: false
     default: 'chore(release): '
-  github-token:
-    description: GitHub token passed to semantic-release (requires repo + write access).
-    required: false
-    default: ''
-  node-version:
-    description: Node.js version to use.
-    required: false
-    default: '24'
-  build-only:
-    description: Run the build step but skip the release step (for testing).
-    required: false
-  manual-tag:
-    description: Manually create the release tag instead of letting semantic-release do it (for testing).
-    required: false
-  dry-run:
-    description: Run semantic-release in dry-run mode (for testing).
-    required: false
-  typecheck:
-    description: Run typechecking but skip the release step (for testing).
-    required: false
-  changelog-file:
-    description: Path to the generated changelog file to commit when using manual-tag mode.
-    required: false
-  additional-assets-json:
-    description: 'Additional files to commit when using manual-tag mode (e.g. package.json).'
-    required: false
   publish:
     description: Dispatch the publish workflow after a successful release.
     required: false

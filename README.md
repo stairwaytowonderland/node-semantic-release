@@ -63,27 +63,24 @@ The publish job only needs `contents: write`.
 
 ### Release mode inputs
 
-| Name                     | Description                                                                                                                     | Required | Default                             |
-| ------------------------ | ------------------------------------------------------------------------------------------------------------------------------- | -------- | ----------------------------------- |
-| `github-token`           | GitHub token passed to semantic-release. Requires `contents: write` and `issues: write` permissions (or a PAT with repo scope). | No¹      | `''`                                |
-| `node-version`           | Node.js version to use.                                                                                                         | No       | `24`                                |
-| `build-only`             | Run the build step but skip the release step. Useful for CI checks.                                                             | No       | —                                   |
-| `typecheck`              | Run `npm run typecheck` after the build and skip the release step. Useful for CI checks.                                        | No       | —                                   |
-| `dry-run`                | Run semantic-release in `--dry-run` mode. No tag or release is created.                                                         | No       | —                                   |
-| `manual-tag`             | Compute the next version with semantic-release (dry-run), then commit release assets and push the tag manually. See note below. | No       | —                                   |
-| `changelog-file`         | Path to the changelog file to commit when using `manual-tag` mode (e.g. `CHANGELOG.md`).                                        | No       | —                                   |
-| `additional-assets-json` | JSON array of additional files to commit when using `manual-tag` mode (e.g. `'["package.json","package-lock.json"]'`).          | No       | —                                   |
-| `commit-author`          | Git author name for commits made by the action when using `manual-tag` mode.                                                    | No       | `semantic-release-bot`              |
-| `commit-email`           | Git author email for commits made by the action when using `manual-tag` mode.                                                   | No       | `semantic-release-bot@martynus.net` |
-| `commit-prefix`          | Prefix for the release commit message when using `manual-tag` mode.                                                             | No       | `chore(release):`                   |
-
-> [!NOTE]
-> ¹ `github-token` is technically optional but is **required** whenever `build-only` is not `true`.
-
 > [!NOTE]
 > **`manual-tag` mode** runs semantic-release in dry-run to determine the next version and generate release
 > notes, then manually commits the specified assets (`changelog-file`, `additional-assets-json`) and pushes
 > an annotated git tag. This is useful for debugging.
+
+| Name                     | Description                                                                                                                     | Required | Default                              |
+| ------------------------ | ------------------------------------------------------------------------------------------------------------------------------- | -------- | ------------------------------------ |
+| `node-version`           | Node.js version to use.                                                                                                         | No       | `24`                                 |
+| `github-token`           | GitHub token passed to semantic-release. Requires `contents: write` and `issues: write` permissions (or a PAT with repo scope). | No¹      | —                                    |
+| `build-only`             | Run the build step but skip the release step. Useful for CI checks.                                                             | No       | —                                    |
+| `typecheck`              | Run `npm run typecheck` after the build and skip the release step. Useful for CI checks.                                        | No       | —                                    |
+| `dry-run`                | Run semantic-release in `--dry-run` mode. No tag or release is created.                                                         | No       | —                                    |
+| `manual-tag`             | Compute the next version with semantic-release (dry-run), then commit release assets and push the tag manually. See note below. | No       | —                                    |
+| `changelog-file`         | Path to the changelog file to commit when using `manual-tag` mode (e.g. `CHANGELOG.md`).                                        | No²      | `CHANGELOG.md`                       |
+| `additional-assets-json` | JSON array of additional files to commit when using `manual-tag` mode (e.g. `["package.json","package-lock.json"]`).            | No²      | ["package.json","package-lock.json"] |
+| `commit-author`          | Git author name for commits made by the action when using `manual-tag` mode.                                                    | No²      | `semantic-release-bot`               |
+| `commit-email`           | Git author email for commits made by the action when using `manual-tag` mode.                                                   | No²      | `semantic-release-bot@martynus.net`  |
+| `commit-prefix`          | Prefix for the release commit message when using `manual-tag` mode.                                                             | No²      | `chore(release):`                    |
 
 ### Publish mode inputs
 
@@ -91,13 +88,17 @@ Set `publish: true` to activate publish mode. All release-mode build/release ste
 
 | Name           | Description                                                                              | Required | Default                  |
 | -------------- | ---------------------------------------------------------------------------------------- | -------- | ------------------------ |
-| `publish`      | Set to `'true'` to create a GitHub Release from an existing tag.                         | Yes²     | —                        |
-| `tag`          | The git tag to publish (e.g. `v1.2.3`).                                                  | No       | `${{ github.ref_name }}` |
-| `notes-b64`    | Base64-encoded release notes. If omitted, notes are read from the annotated tag message. | No       | —                        |
-| `github-token` | Token used by `gh release create`. Requires `contents: write`.                           | No¹      | `''`                     |
+| `publish`      | Set to `true` to create a GitHub Release from an existing tag.                           | No³      | —                        |
+| `tag`          | The git tag to publish (e.g. `v1.2.3`).                                                  | No³      | `${{ github.ref_name }}` |
+| `notes-b64`    | Base64-encoded release notes. If omitted, notes are read from the annotated tag message. | No³      | —                        |
+| `github-token` | Token used by `gh release create`. Requires `contents: write`.                           | No¹      | —                        |
 
 > [!NOTE]
-> ² Only relevant when `publish` is `'true'`.
+> ¹ `github-token` is technically optional but is **required whenever `build-only` is *not* `true`**.
+>
+> ² Only relevant when `manual_tag` is `true`.
+>
+> ³ Only relevant when `publish` is `true`.
 
 ## Outputs
 
@@ -105,7 +106,7 @@ Set `publish: true` to activate publish mode. All release-mode build/release ste
 
 | Name                       | Description                                                                                                                                                           |
 | -------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `new-release-published`    | `'true'` if a new release was published; `'false'` otherwise.                                                                                                         |
+| `new-release-published`    | `true` if a new release was published; `false` otherwise.                                                                                                             |
 | `new-release-version`      | Version number of the new release (e.g. `1.2.3`). Empty if no release was published.                                                                                  |
 | `new-release-git-tag`      | Git tag of the new release (e.g. `v1.2.3`). Empty if no release was published.                                                                                        |
 | `new-release-notes`        | Release notes in Markdown. Empty if no release was published.                                                                                                         |
@@ -119,7 +120,7 @@ Set `publish: true` to activate publish mode. All release-mode build/release ste
 | `release-tag`       | Git tag of the release that was published.             |
 | `release-sha`       | Git SHA of the release tag that was published.         |
 | `release-notes-b64` | Base64-encoded release notes of the published release. |
-| `release-published` | `'true'` if the release was published.                 |
+| `release-published` | `true` if the release was published.                   |
 
 ## Prerequisites
 
@@ -157,8 +158,14 @@ its own default templates from the `templates/` directory. It is recommended to 
     ["@semantic-release/changelog", { "changelogFile": "CHANGELOG.md" }],
     "@semantic-release/commit-analyzer",
     "@semantic-release/release-notes-generator",
-    "@semantic-release/npm",
-    "@semantic-release/git"
+    ["@semantic-release/npm", { "npmPublish": false }],
+    [
+      "@semantic-release/git",
+        {
+          "assets": ["CHANGELOG.md", "package.json", "package-lock.json"],
+          "message": "chore(release): ${nextRelease.version}\n\n${nextRelease.notes}"
+        }
+    ]
   ]
 }
 ```
