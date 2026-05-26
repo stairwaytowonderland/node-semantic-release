@@ -58,17 +58,9 @@ jobs:
           token: ${{ secrets.github-token || secrets.GITHUB_TOKEN }}
           # ref: ${{ github.sha }}
 
-      - name: Checkout action repo
-        uses: actions/checkout@v6
-        with:
-          token: ${{ secrets.github-token || secrets.GITHUB_TOKEN }}
-          repository: ${{ github.action_repository }}
-          ref: ${{ github.action_ref }}
-          path: ./.node-semantic-release
-
       - name: Semantic release
         id: release
-        uses: ./.node-semantic-release/action.yaml
+        uses: ./
         with:
           github-token: ${{ secrets.github-token || secrets.GITHUB_TOKEN }}
           changelog-file: ${{ inputs.changelog-file }}
