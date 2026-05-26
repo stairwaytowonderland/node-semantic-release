@@ -68,7 +68,7 @@ jobs:
 
       - name: Semantic release
         id: release
-        uses: ./.node-semantic-release
+        uses: ./.node-semantic-release/action.yaml
         with:
           github-token: ${{ secrets.github-token || secrets.GITHUB_TOKEN }}
           changelog-file: ${{ inputs.changelog-file }}
