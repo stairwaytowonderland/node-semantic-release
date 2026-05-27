@@ -123,13 +123,15 @@ runs:
           echo "::warning::package.json not found. Copying default configuration."
           echo "::notice::Used default package.json. Please add a package.json file to customize your project."
           cp "${GITHUB_ACTION_PATH}/templates/package.json" "${GITHUB_WORKSPACE}/"
-          npm install --package-lock-only
+          ls -la "${GITHUB_WORKSPACE}"
         fi
 
     - name: Install dependencies
       if: inputs.publish != 'true'
       shell: bash
-      run: npm ci
+      run: |
+        ls -la
+        npm ci
 
     - name: Build
       if: inputs.publish != 'true'
