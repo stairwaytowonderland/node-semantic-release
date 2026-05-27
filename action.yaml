@@ -120,6 +120,7 @@ runs:
         fi
 
     - name: Has dependency lock file
+      id: validate
       if: inputs.publish != 'true'
       shell: bash
       run: |
@@ -129,12 +130,18 @@ runs:
           echo "has-lock-file=false" >> "$GITHUB_OUTPUT"
         fi
 
-    - name: Setup Node.js
-      if: inputs.publish != 'true'
+    - name: Setup Node.js with cache
+      if: inputs.publish != 'true' && steps.validate.outputs.has-lock-file == 'true'
       uses: actions/setup-node@v6
       with:
         node-version: ${{ inputs.node-version }}
-        cache: ${{ steps.has-lock-file.outputs.has-lock-file == 'true' && 'npm' || '' }}
+        cache: npm
+
+    - name: Setup Node.js without cache
+      if: inputs.publish == 'true' && steps.validate.outputs.has-lock-file != 'true'
+      uses: actions/setup-node@v6
+      with:
+        node-version: ${{ inputs.node-version }}
 
     - name: Install dependencies
       if: inputs.publish != 'true'
