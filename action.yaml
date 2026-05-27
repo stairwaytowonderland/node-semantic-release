@@ -116,7 +116,6 @@ runs:
           echo "::warning::package.json not found. Copying default configuration."
           echo "::notice::Used default package.json. Please add a package.json file to customize your project."
           cp "${GITHUB_ACTION_PATH}/templates/package.json" "${GITHUB_WORKSPACE}/"
-          ls -la "${GITHUB_WORKSPACE}"
         fi
 
     - name: Has dependency lock file
