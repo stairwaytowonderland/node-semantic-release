@@ -98,6 +98,14 @@ outputs:
 runs:
   using: composite
   steps:
+    - name: Show action path contents for debugging
+      shell: bash
+      run: |
+        echo "Action path contents:"
+        ls -la "${GITHUB_ACTION_PATH}"
+        echo "Workspace contents:"
+        ls -la "${GITHUB_WORKSPACE}"
+
     - name: Ensure .releaserc
       if: inputs.publish != 'true'
       shell: bash
