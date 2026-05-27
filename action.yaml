@@ -98,13 +98,6 @@ outputs:
 runs:
   using: composite
   steps:
-    - name: Setup Node.js
-      if: inputs.publish != 'true'
-      uses: actions/setup-node@v6
-      with:
-        node-version: ${{ inputs.node-version }}
-        cache: npm
-
     - name: Ensure .releaserc
       if: inputs.publish != 'true'
       shell: bash
@@ -126,12 +119,28 @@ runs:
           ls -la "${GITHUB_WORKSPACE}"
         fi
 
-    - name: Install dependencies
+    - name: Set cache depedency path
       if: inputs.publish != 'true'
       shell: bash
       run: |
-        ls -la
-        npm ci
+        if [ ! -f "${GITHUB_WORKSPACE}/package-lock.json" ]; then
+          echo "cache-dependency-path=${GITHUB_WORKSPACE}/package.json" >> "$GITHUB_OUTPUT"
+        else
+          echo "cache-dependency-path=${GITHUB_WORKSPACE}/package-lock.json" >> "$GITHUB_OUTPUT"
+        fi
+
+    - name: Setup Node.js
+      if: inputs.publish != 'true'
+      uses: actions/setup-node@v6
+      with:
+        node-version: ${{ inputs.node-version }}
+        cache: npm
+        cache-dependency-path: ${{ steps.set-cache-dependency-path.outputs.cache-dependency-path }}
+
+    - name: Install dependencies
+      if: inputs.publish != 'true'
+      shell: bash
+      run: npm ci
 
     - name: Build
       if: inputs.publish != 'true'
