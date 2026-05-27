@@ -1,6 +1,6 @@
 {
 	"name": "node-semantic-release",
-	"version": "1.153.0",
+	"version": "1.154.0",
 	"description": "A semantic-release plugin to automate releases from a repository root.",
 	"scripts": {
 		"build": "echo 'Nothing to build'"
