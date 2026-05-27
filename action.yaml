@@ -137,6 +137,13 @@ runs:
         node-version: ${{ inputs.node-version }}
         cache: ${{ steps.validate.outputs.has-lock-file == 'true' && 'npm' || '' }}
 
+    - name: Ensure package-lock.json
+      if: inputs.publish != 'true' && steps.validate.outputs.has-lock-file == 'false'
+      shell: bash
+      run: |
+        echo "::warning::package-lock.json not found. Generating lock file with 'npm install'."
+        npm install --package-lock-only
+
     - name: Install dependencies
       if: inputs.publish != 'true'
       shell: bash
