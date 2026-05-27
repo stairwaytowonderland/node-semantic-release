@@ -119,14 +119,14 @@ runs:
           ls -la "${GITHUB_WORKSPACE}"
         fi
 
-    - name: Set cache depedency path
+    - name: Has dependency lock file
       if: inputs.publish != 'true'
       shell: bash
       run: |
-        if [ ! -f "${GITHUB_WORKSPACE}/package-lock.json" ]; then
-          echo "cache-dependency-path=${GITHUB_WORKSPACE}/package.json" >> "$GITHUB_OUTPUT"
+        if [ -f "${GITHUB_WORKSPACE}/package-lock.json" ]; then
+          echo "has-lock-file=true" >> "$GITHUB_OUTPUT"
         else
-          echo "cache-dependency-path=${GITHUB_WORKSPACE}/package-lock.json" >> "$GITHUB_OUTPUT"
+          echo "has-lock-file=false" >> "$GITHUB_OUTPUT"
         fi
 
     - name: Setup Node.js
@@ -134,8 +134,7 @@ runs:
       uses: actions/setup-node@v6
       with:
         node-version: ${{ inputs.node-version }}
-        cache: npm
-        cache-dependency-path: ${{ steps.set-cache-dependency-path.outputs.cache-dependency-path }}
+        cache: ${{ steps.has-lock-file.outputs.has-lock-file == 'true' && 'npm' || '' }}
 
     - name: Install dependencies
       if: inputs.publish != 'true'
