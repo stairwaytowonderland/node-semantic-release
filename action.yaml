@@ -98,14 +98,6 @@ outputs:
 runs:
   using: composite
   steps:
-    - name: Show action path contents for debugging
-      shell: bash
-      run: |
-        echo "Action path contents:"
-        ls -la "${GITHUB_ACTION_PATH}"
-        echo "Workspace contents:"
-        ls -la "${GITHUB_WORKSPACE}"
-
     - name: Ensure .releaserc
       if: inputs.publish != 'true'
       shell: bash
@@ -113,7 +105,7 @@ runs:
         if [ ! -f "${GITHUB_WORKSPACE}/.releaserc" ] && [ ! -f "${GITHUB_WORKSPACE}/.releaserc.json" ] && [ ! -f "${GITHUB_WORKSPACE}/.releaserc.yaml" ] && [ ! -f "${GITHUB_WORKSPACE}/.releaserc.config.js" ]; then
           echo "::warning::.releaserc not found. Copying default configuration."
           echo "::notice::Used default .releaserc. Please add a .releaserc file to customize your release process."
-          cp "${GITHUB_ACTION_PATH}/templates/.releaserc" "${GITHUB_WORKSPACE}/"
+          cp "${GITHUB_ACTION_PATH}/templates/releaserc.json" "${GITHUB_WORKSPACE}/.releaserc"
         fi
 
     - name: Ensure package.json
