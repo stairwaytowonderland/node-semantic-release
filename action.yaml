@@ -113,7 +113,6 @@ runs:
           echo "::warning::.releaserc not found. Copying default configuration."
           echo "::notice::Used default .releaserc. Please add a .releaserc file to customize your release process."
           cp "${GITHUB_ACTION_PATH}/templates/.releaserc" "${GITHUB_WORKSPACE}/"
-          npm install --package-lock-only
         fi
 
     - name: Ensure package.json
@@ -124,6 +123,7 @@ runs:
           echo "::warning::package.json not found. Copying default configuration."
           echo "::notice::Used default package.json. Please add a package.json file to customize your project."
           cp "${GITHUB_ACTION_PATH}/templates/package.json" "${GITHUB_WORKSPACE}/"
+          npm install --package-lock-only
         fi
 
     - name: Install dependencies
