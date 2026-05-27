@@ -131,17 +131,11 @@ runs:
         fi
 
     - name: Setup Node.js with cache
-      if: inputs.publish != 'true' && steps.validate.outputs.has-lock-file == 'true'
+      if: inputs.publish != 'true'
       uses: actions/setup-node@v6
       with:
         node-version: ${{ inputs.node-version }}
-        cache: npm
-
-    - name: Setup Node.js without cache
-      if: inputs.publish == 'true' && steps.validate.outputs.has-lock-file != 'true'
-      uses: actions/setup-node@v6
-      with:
-        node-version: ${{ inputs.node-version }}
+        cache: ${{ steps.validate.outputs.has-lock-file == 'true' && 'npm' || '' }}
 
     - name: Install dependencies
       if: inputs.publish != 'true'
