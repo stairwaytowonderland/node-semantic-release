@@ -1,4 +1,4 @@
-name: CI Package Update
+name: CI Package Updates
 
 on:
   push:
