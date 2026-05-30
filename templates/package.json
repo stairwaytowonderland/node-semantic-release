@@ -2,10 +2,7 @@
 	"name": "template",
 	"version": "0.0.0",
 	"description": "A template for a semantic-release plugin.",
-	"type": "module",
-	"engines": {
-		"node": ">=24.0.0"
-	},
+	"private": true,
 	"scripts": {
 		"build": "echo 'Nothing to build'"
 	},
