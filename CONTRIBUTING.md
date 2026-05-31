@@ -63,21 +63,6 @@ Then create a pull request on GitHub with:
 
 ## Development Guidelines
 
-**Creating a *virtual environment* is <ins>highly recommended</ins>**
-
-```bash
-python3 -m venv path/to/venv # e.g. `python3 -m venv .venv`
-. path/to/venv/bin/activate  # e.g. `. .venv/bin/activate`
-```
-
-> [!NOTE]
-> Typically, *'path/to/venv'* is *'.venv'* in the current directory.
->
-> Run `deactivate` to deactivate the *virtual environment*.
-
-Please see the [official documentation](https://packaging.python.org/en/latest/tutorials/installing-packages/#optionally-create-a-virtual-environment)
-for more information.
-
 ### Code Style Guidelines
 
 - Ensure your code is well-commented and self-documenting.
@@ -93,6 +78,22 @@ missing semicolons, trailing whitespace, and debug statements. By using these ho
 prevent bad code from being uploaded.
 
 To install `pre-commit`, you can use `pip`:
+
+> [!TIP]
+>
+> **Creating a *virtual environment* is <ins>highly recommended</ins>**
+>
+> ```bash
+> python3 -m venv path/to/venv # e.g. `python3 -m venv .venv`
+> . path/to/venv/bin/activate  # e.g. `. .venv/bin/activate`
+> ```
+>
+> **Typically, *'path/to/venv'* is *'.venv'* in the current directory: `python3 -m venv .venv`**
+>
+> Run `deactivate` to deactivate the *virtual environment*.
+
+Please see the [official documentation](https://packaging.python.org/en/latest/tutorials/installing-packages/#optionally-create-a-virtual-environment)
+for more information.
 
 ```bash
 pip3 install pre-commit
