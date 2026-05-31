@@ -152,8 +152,6 @@ For more details on how to configure and use pre-commit, please refer to the off
 
 The [`.gitignore`](./.gitignore) file prevents unnecessary files from being committed.
 
-**[Important Note]**: [Any important notes, e.g., Final deliverables should be stored elsewhere].
-
 ## Review Checklist
 
 Before submitting a PR, ensure:
