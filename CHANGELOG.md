@@ -1,3 +1,9 @@
+## [1.164.0](https://github.com/stairwaytowonderland/node-semantic-release/compare/v1.163.0...v1.164.0) (2026-06-07)
+
+### ✨ Features
+
+* updating template releaserc ([fac4adb](https://github.com/stairwaytowonderland/node-semantic-release/commit/fac4adb1128450de1bd7d024467b0ef606407708))
+
 ## [1.163.0](https://github.com/stairwaytowonderland/node-semantic-release/compare/v1.162.0...v1.163.0) (2026-06-07)
 
 ### ✨ Features
