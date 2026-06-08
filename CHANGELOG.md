@@ -1,3 +1,9 @@
+## [1.167.0](https://github.com/stairwaytowonderland/node-semantic-release/compare/v1.166.0...v1.167.0) (2026-06-08)
+
+### ✨ Features
+
+* updating workflows ([e3593c3](https://github.com/stairwaytowonderland/node-semantic-release/commit/e3593c38a518cb9528179f83c442aa30bc805264))
+
 ## [1.166.0](https://github.com/stairwaytowonderland/node-semantic-release/compare/v1.165.0...v1.166.0) (2026-06-08)
 
 ### ✨ Features
