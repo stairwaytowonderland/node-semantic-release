@@ -7,6 +7,7 @@ inputs:
   github-token:
     description: GitHub token passed to semantic-release (requires repo + write access).
     required: false
+    default: ${{ github.token }}
   node-version:
     description: Node.js version to use.
     required: false
@@ -173,7 +174,7 @@ runs:
       shell: bash
       run: npx semantic-release ${DRY_RUN_FLAG}
       env:
-        GITHUB_TOKEN: ${{ inputs.github-token || github.token }}
+        GITHUB_TOKEN: ${{ inputs.github-token }}
         DRY_RUN_FLAG: ${{ inputs.manual-tag == 'true' || inputs.dry-run == 'true' && '--dry-run' || '' }}
 
     - name: Set notes file

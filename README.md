@@ -91,7 +91,7 @@ Set `publish: true` to activate publish mode. All release-mode build/release ste
 | `publish`      | Set to `true` to create a GitHub Release from an existing tag.                           | No³      | —                        |
 | `tag`          | The git tag to publish (e.g. `v1.2.3`).                                                  | No³      | `${{ github.ref_name }}` |
 | `notes-b64`    | Base64-encoded release notes. If omitted, notes are read from the annotated tag message. | No³      | —                        |
-| `github-token` | Token used by `gh release create`. Requires `contents: write`.                           | No¹      | —                        |
+| `github-token` | Token used by `gh release create`. Requires `contents: write`.                           | No¹      | ${{ github.token }}      |
 
 > [!NOTE]
 > ¹ `github-token` is technically optional but is **required whenever `build-only` is *not* `true`**.
