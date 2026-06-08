@@ -11,10 +11,6 @@ on:
         description: 'Base64-encoded release notes (Markdown)'
         type: string
         required: false
-    secrets:
-      github-token:
-        description: 'GitHub Personal Access Token with repo scope for creating releases.'
-        required: false
 
 jobs:
   publish:
@@ -45,7 +41,8 @@ jobs:
         uses: actions/checkout@v6
         with:
           ref: ${{ steps.vars.outputs.tag }}
-          token: ${{ secrets.github-token || secrets.GITHUB_TOKEN }}
+          persist-credentials: false
+          # token: ${{ secrets.github-token || secrets.GITHUB_TOKEN }}
           fetch-depth: 0
 
       - name: Publish release
@@ -53,6 +50,6 @@ jobs:
         uses: ./
         with:
           publish: true
-          github-token: ${{ secrets.github-token || secrets.GITHUB_TOKEN }}
+          github-token: ${{ secrets.GH_PAT_CREATE_RELEASE }}
           notes-b64: ${{ inputs.notes-b64 }}
           tag: ${{ steps.vars.outputs.tag }}

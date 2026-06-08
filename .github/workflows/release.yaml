@@ -55,14 +55,15 @@ jobs:
         uses: actions/checkout@v6
         with:
           fetch-depth: 0
-          token: ${{ secrets.github-token || secrets.GITHUB_TOKEN }}
+          persist-credentials: false
+          # token: ${{ secrets.github-token || secrets.GITHUB_TOKEN }}
           # ref: ${{ github.sha }}
 
       - name: Semantic release
         id: release
         uses: ./
         with:
-          github-token: ${{ secrets.github-token || secrets.GITHUB_TOKEN }}
+          github-token: ${{ secrets.GH_PAT_CREATE_RELEASE }}
           changelog-file: ${{ inputs.changelog-file }}
           additional-assets-json: ${{ inputs.additional-assets-json }}
 
