@@ -53,3 +53,4 @@ updates:
         applies-to: version-updates
         patterns:
           - '*'
+    assignees: ['andrewhaller']
