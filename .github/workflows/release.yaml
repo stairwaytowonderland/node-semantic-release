@@ -66,18 +66,21 @@ jobs:
             has_token=true
           fi
           echo "has-token=$has_token" >> "$GITHUB_OUTPUT"
+          echo "::debug::has-token=$has_token"
 
           can_generate_app_token=false
           if [ -n "$APP_PRIVATE_KEY" ] && [ -n "$APP_CLIENT_ID" ]; then
             can_generate_app_token=true
           fi
           echo "can-generate-app-token=$can_generate_app_token" >> "$GITHUB_OUTPUT"
+          echo "::debug::can-generate-app-token=$can_generate_app_token"
 
           generate_app_token=false
           if ! $has_token && $can_generate_app_token; then
             generate_app_token=true
           fi
           echo "generate-app-token=$generate_app_token" >> "$GITHUB_OUTPUT"
+          echo "::debug::generate-app-token=$generate_app_token"
         env:
           INPUT_GITHUB_TOKEN: ${{ secrets.github-token }}
           APP_PRIVATE_KEY: ${{ secrets.ORG_REPO_USER_PRIVATE_KEY }}
