@@ -49,15 +49,21 @@ jobs:
         run: |
           echo "is-dispatch-workflow=$IS_DISPATCH_WORKFLOW" >> "$GITHUB_OUTPUT"
         env:
-          IS_DISPATCH_WORKFLOW: ${{ secrets.github-token != secrets.GITHUB_TOKEN && inputs.dispatch-workflow != '' }}
+          IS_DISPATCH_WORKFLOW: ${{ inputs.dispatch-workflow != '' }}
 
       - name: Checkout
         uses: actions/checkout@v6
         with:
           fetch-depth: 0
           persist-credentials: false
-          # token: ${{ secrets.github-token || secrets.GITHUB_TOKEN }}
-          # ref: ${{ github.sha }}
+
+      - name: Get auth token
+        id: get-token
+        uses: stairwaytowonderland/actions/.github/actions/auth-token-action@v1
+        with:
+          github-token: ${{ secrets.github-token }}
+          app-private-key: ${{ secrets.ORG_REPO_USER_PRIVATE_KEY }}
+          app-client-id: ${{ vars.ORG_REPO_USER_APP_ID }}
 
       - name: Semantic release
         id: release
