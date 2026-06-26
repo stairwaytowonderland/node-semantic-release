@@ -1,4 +1,21 @@
 version: 2
+registries:
+  # https://docs.github.com/en/code-security/how-tos/secure-your-supply-chain/manage-your-dependency-security/configure-access-to-private-registries#git
+  # github:
+  #   type: git
+  #   url: https://github.com/
+  #   username: x-access-token
+  #   password: ${{ secrets.GH_PAT_DEPENDABOT }}
+  # https://docs.github.com/en/code-security/how-tos/secure-your-supply-chain/manage-your-dependency-security/configure-access-to-private-registries#npm-registry
+  # npm-github:
+  #   type: npm-registry
+  #   url: https://npm.pkg.github.com
+  #   token: ${{ secrets.GH_PAT_DEPENDABOT }}
+  #   replaces-base: true
+  public-npm:
+    type: npm-registry
+    url: https://registry.npmjs.org # Forces Dependabot to use the public registry
+    replaces-base: true
 updates:
   - package-ecosystem: 'github-actions'
     directory: '/'
