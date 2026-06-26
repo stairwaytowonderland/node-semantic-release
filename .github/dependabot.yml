@@ -6,8 +6,10 @@ updates:
       # interval: "monthly"
       # day: "friday"
       interval: 'daily'
-    labels:
-      - 'dependencies'
+    commit-message:
+      prefix: 'ci'
+      include: 'scope' # Automatically appends "(deps)" -> ci(deps):
+    labels: ['dependencies', 'deps:github-actions']
     groups:
       github-actions:
         applies-to: version-updates
@@ -22,8 +24,10 @@ updates:
     ignore:
       - dependency-name: '*'
         update-types: ['version-update:semver-major']
-    labels:
-      - 'dependencies'
+    commit-message:
+      prefix: 'chore'
+      include: 'scope' # Automatically appends "(deps)" -> chore(deps):
+    labels: ['dependencies', 'deps:javascript']
     groups:
       npm:
         applies-to: version-updates
