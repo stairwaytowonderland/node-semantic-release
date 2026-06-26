@@ -20,7 +20,7 @@ registries:
   public-npm:
     type: npm-registry
     url: https://registry.npmjs.org # Forces Dependabot to use the public registry
-    token: 'not-needed-for-public-registry' # Required for schema validation (for type: npm-registry), but not actually used for public registries
+    token: ${{ secrets.GH_PUBLIC_DEPENDABOT_NPM_DUMMY }} # Required for schema validation (for type: npm-registry), but not actually used for public registries
     replaces-base: true
 updates:
   - package-ecosystem: 'github-actions'
