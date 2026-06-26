@@ -81,6 +81,6 @@ updates:
         applies-to: version-updates
         patterns:
           - '*'
-    # assignees: ['andrewhaller']
+    assignees: ['andrewhaller']
     registries:
       - public-npm
