@@ -75,3 +75,5 @@ updates:
         patterns:
           - '*'
     assignees: ['andrewhaller']
+    registries:
+      - public-npm
