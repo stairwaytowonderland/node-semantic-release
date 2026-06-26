@@ -69,7 +69,7 @@ jobs:
         id: release
         uses: ./
         with:
-          github-token: ${{ secrets.GH_PAT_CREATE_RELEASE }}
+          github-token: ${{ steps.get-token.outputs.auth-token }}
           changelog-file: ${{ inputs.changelog-file }}
           additional-assets-json: ${{ inputs.additional-assets-json }}
 
