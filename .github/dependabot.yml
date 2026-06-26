@@ -1,4 +1,10 @@
 version: 2
+registries:
+  public-npm:
+    type: npm-registry
+    url: https://registry.npmjs.org
+    # This forces Dependabot to treat this registry as the global base
+    replaces-base: true
 updates:
   - package-ecosystem: 'github-actions'
     directory: '/'
@@ -59,3 +65,5 @@ updates:
         patterns:
           - '*'
     assignees: ['andrewhaller']
+    registries:
+      - public-npm
