@@ -12,9 +12,9 @@ registries:
   #   url: https://npm.pkg.github.com
   #   token: ${{ secrets.GH_PAT_DEPENDABOT }}
   #   replaces-base: true
-  # public-npm:
-  #   type: npm-registry
-  #   url: https://registry.npmjs.org # Forces Dependabot to use the public registry
+  public-npm:
+    type: npm-registry
+    url: https://registry.npmjs.org # Forces Dependabot to use the public registry
 updates:
   - package-ecosystem: 'github-actions'
     directory: '/'
