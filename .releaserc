@@ -22,6 +22,11 @@
 						"release": "patch"
 					},
 					{
+						"type": "ci",
+						"scope": "deps",
+						"release": "patch"
+					},
+					{
 						"type": "chore",
 						"release": false
 					},

@@ -2,12 +2,32 @@ version: 2
 updates:
   - package-ecosystem: 'github-actions'
     directory: '/'
+    exclude-paths:
+      - '.github/workflows/*'
+      - '.github/actions/**'
     schedule:
       # interval: "monthly"
       # day: "friday"
       interval: 'daily'
     commit-message:
       prefix: 'ci'
+      include: 'scope' # Automatically appends "(deps)" -> ci(deps):
+    labels: ['dependencies', 'deps:github-actions']
+    groups:
+      github-actions:
+        applies-to: version-updates
+        patterns:
+          - '*'
+  - package-ecosystem: 'github-actions'
+    directories:
+      - '.github/workflows'
+      - '.github/actions/**'
+    schedule:
+      # interval: "monthly"
+      # day: "friday"
+      interval: 'daily'
+    commit-message:
+      prefix: 'chore'
       include: 'scope' # Automatically appends "(deps)" -> ci(deps):
     labels: ['dependencies', 'deps:github-actions']
     groups:
