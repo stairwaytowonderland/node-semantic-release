@@ -20,7 +20,7 @@
 						"release": "patch"
 					},
 					{
-						"type": "ci",
+						"type": "chore",
 						"scope": "deps",
 						"release": "patch"
 					},
@@ -30,6 +30,10 @@
 					},
 					{
 						"type": "style",
+						"release": false
+					},
+					{
+						"scope": "no-release",
 						"release": false
 					},
 					{

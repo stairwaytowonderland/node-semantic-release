@@ -22,17 +22,9 @@
 						"release": "patch"
 					},
 					{
-						"type": "ci",
+						"type": "chore",
 						"scope": "deps",
 						"release": "patch"
-					},
-					{
-						"type": "chore",
-						"release": false
-					},
-					{
-						"type": "style",
-						"release": false
 					},
 					{
 						"scope": "no-release",
