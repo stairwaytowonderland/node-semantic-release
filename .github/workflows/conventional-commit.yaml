@@ -1,0 +1,12 @@
+name: Conventional Commit Check
+
+on:
+  pull_request:
+    branches: [main]
+    types: [opened, synchronize, reopened]
+
+jobs:
+  conventional-commit:
+    name: Run Conventional Commit Check
+    uses: stairwaytowonderland/actions/.github/workflows/conventional-commit.yaml@v1
+    secrets: inherit
