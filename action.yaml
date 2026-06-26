@@ -62,6 +62,10 @@ inputs:
     description: The git tag or ref to use for publish.
     required: false
     default: ${{ github.ref_name }}
+  # ref:
+  #   description: The git tag or ref to use for publish.
+  #   required: false
+  #   default: ${{ github.ref_name }}
 
 outputs:
   new-release-published:

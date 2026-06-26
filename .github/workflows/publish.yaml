@@ -51,7 +51,7 @@ jobs:
           fetch-depth: 0
 
       - name: Get auth token
-        id: get-token
+        id: auth-token
         uses: stairwaytowonderland/actions/.github/actions/auth-token-action@v1
         with:
           github-token: ${{ secrets.github-token }}
@@ -63,6 +63,6 @@ jobs:
         uses: ./
         with:
           publish: true
-          github-token: ${{ steps.get-token.outputs.auth-token }}
+          github-token: ${{ steps.auth-token.outputs.token }}
           notes-b64: ${{ inputs.notes-b64 }}
           tag: ${{ steps.vars.outputs.tag }}
