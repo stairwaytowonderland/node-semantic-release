@@ -12,6 +12,11 @@ on:
         type: string
         required: false
 
+    secrets:
+      github-token:
+        description: 'GitHub Personal Access Token with repo scope for creating releases.'
+        required: false
+
 jobs:
   publish:
     name: Publish GitHub Release
@@ -45,11 +50,19 @@ jobs:
           # token: ${{ secrets.github-token || secrets.GITHUB_TOKEN }}
           fetch-depth: 0
 
+      - name: Get auth token
+        id: get-token
+        uses: stairwaytowonderland/actions/.github/actions/auth-token-action@v1
+        with:
+          github-token: ${{ secrets.github-token }}
+          app-private-key: ${{ secrets.ORG_REPO_USER_PRIVATE_KEY }}
+          app-client-id: ${{ vars.ORG_REPO_USER_APP_ID }}
+
       - name: Publish release
         id: publish
         uses: ./
         with:
           publish: true
-          github-token: ${{ secrets.GH_PAT_CREATE_RELEASE }}
+          github-token: ${{ steps.get-token.outputs.auth-token }}
           notes-b64: ${{ inputs.notes-b64 }}
           tag: ${{ steps.vars.outputs.tag }}
