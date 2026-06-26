@@ -176,12 +176,14 @@ runs:
       if: inputs.publish != 'true' && inputs.build-only != 'true'
       id: release
       shell: bash
-      run: |
-        # Force Git remote to point to the caller repository using the input token
-        git remote set-url origin https://x-access-token:${GH_TOKEN}@github.com/${GITHUB_REPOSITORY}.git
-        npx semantic-release ${DRY_RUN_FLAG}
+      # run: |
+      #   # Force Git remote to point to the caller repository using the input token
+      #   git remote set-url origin https://x-access-token:${GH_TOKEN}@github.com/${GITHUB_REPOSITORY}.git
+      #   npx semantic-release ${DRY_RUN_FLAG}
+      run: npx semantic-release ${DRY_RUN_FLAG}
       env:
         GH_TOKEN: ${{ inputs.github-token }}
+        # GITHUB_TOKEN: ${{ inputs.github-token }}
         DRY_RUN_FLAG: ${{ inputs.manual-tag == 'true' || inputs.dry-run == 'true' && '--dry-run' || '' }}
 
     - name: Set notes file
