@@ -50,19 +50,45 @@ jobs:
           # token: ${{ secrets.github-token || secrets.GITHUB_TOKEN }}
           fetch-depth: 0
 
-      - name: Get auth token
-        id: auth-token
-        uses: stairwaytowonderland/actions/.github/actions/auth-token-action@v1
+      - name: Resolve auth strategy
+        id: resolve-auth
+        shell: bash
+        run: |
+          has_token=false
+          if [ -n "$INPUT_GITHUB_TOKEN" ]; then
+            has_token=true
+          fi
+          echo "has-token=$has_token" >> "$GITHUB_OUTPUT"
+
+          can_generate_app_token=false
+          if [ -n "$APP_PRIVATE_KEY" ] && [ -n "$APP_CLIENT_ID" ]; then
+            can_generate_app_token=true
+          fi
+          echo "can-generate-app-token=$can_generate_app_token" >> "$GITHUB_OUTPUT"
+
+          generate_app_token=false
+          if ! $has_token && $can_generate_app_token; then
+            generate_app_token=true
+          fi
+          echo "generate-app-token=$generate_app_token" >> "$GITHUB_OUTPUT"
+        env:
+          INPUT_GITHUB_TOKEN: ${{ secrets.github-token }}
+          APP_PRIVATE_KEY: ${{ secrets.ORG_REPO_USER_PRIVATE_KEY }}
+          APP_CLIENT_ID: ${{ vars.ORG_REPO_USER_APP_ID }}
+
+      - name: Generate GitHub App Token
+        id: generate-token
+        if: steps.resolve-auth.outputs.generate-app-token == 'true'
+        uses: actions/create-github-app-token@v3
         with:
-          github-token: ${{ secrets.github-token }}
-          app-private-key: ${{ secrets.ORG_REPO_USER_PRIVATE_KEY }}
-          app-client-id: ${{ vars.ORG_REPO_USER_APP_ID }}
+          client-id: ${{ vars.ORG_REPO_USER_APP_ID }}
+          private-key: ${{ secrets.ORG_REPO_USER_PRIVATE_KEY }}
 
       - name: Publish release
         id: publish
         uses: ./
         with:
           publish: true
-          github-token: ${{ steps.auth-token.outputs.token }}
+          github-token: ${{ steps.resolve-auth.outputs.generate-app-token == 'true' && steps.generate-token.outputs.token || secrets.github-token }}
           notes-b64: ${{ inputs.notes-b64 }}
           tag: ${{ steps.vars.outputs.tag }}
