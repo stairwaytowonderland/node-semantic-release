@@ -7,11 +7,14 @@ registries:
   #   username: x-access-token
   #   password: ${{ secrets.GH_PAT_DEPENDABOT }}
   # https://docs.github.com/en/code-security/how-tos/secure-your-supply-chain/manage-your-dependency-security/configure-access-to-private-registries#npm-registry
-  npm-github:
+  # npm-github:
+  #   type: npm-registry
+  #   url: https://npm.pkg.github.com
+  #   token: ${{ secrets.GH_PAT_DEPENDABOT }}
+  #   replaces-base: true
+  public-npm:
     type: npm-registry
-    url: https://npm.pkg.github.com
-    token: ${{ secrets.GH_PAT_DEPENDABOT }}
-    replaces-base: true
+    url: https://registry.npmjs.org # Forces Dependabot to use the public registry
 updates:
   - package-ecosystem: 'github-actions'
     directory: '/'
@@ -67,4 +70,4 @@ updates:
         patterns:
           - '*'
     registries:
-      - npm-github
+      - public-npm
