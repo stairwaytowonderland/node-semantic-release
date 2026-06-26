@@ -47,7 +47,6 @@ jobs:
         with:
           ref: ${{ steps.vars.outputs.tag }}
           persist-credentials: false
-          # token: ${{ secrets.github-token || secrets.GITHUB_TOKEN }}
           fetch-depth: 0
 
       - name: Resolve auth strategy

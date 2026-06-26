@@ -182,8 +182,8 @@ runs:
       #   npx semantic-release ${DRY_RUN_FLAG}
       run: npx semantic-release ${DRY_RUN_FLAG}
       env:
-        GH_TOKEN: ${{ inputs.github-token }}
-        # GITHUB_TOKEN: ${{ inputs.github-token }}
+        # GH_TOKEN: ${{ inputs.github-token }}
+        GITHUB_TOKEN: ${{ inputs.github-token }}
         DRY_RUN_FLAG: ${{ inputs.manual-tag == 'true' || inputs.dry-run == 'true' && '--dry-run' || '' }}
 
     - name: Set notes file
