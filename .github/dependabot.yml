@@ -71,7 +71,7 @@ updates:
       interval: 'weekly'
     ignore:
       - dependency-name: '*'
-        # update-types: ['version-update:semver-major']
+        update-types: ['version-update:semver-major']
     commit-message:
       prefix: 'chore'
       include: 'scope' # Automatically appends "(deps)" -> chore(deps):
