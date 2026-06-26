@@ -178,7 +178,7 @@ runs:
       shell: bash
       run: |
         # Force Git remote to point to the caller repository using the input token
-        git remote set-url origin https://x-access-token:${GH_TOKEN}@://github.com/${GITHUB_REPOSITORY}.git
+        # git remote set-url origin https://x-access-token:${GH_TOKEN}@://github.com/${GITHUB_REPOSITORY}.git
         npx semantic-release ${DRY_RUN_FLAG}
       env:
         GH_TOKEN: ${{ inputs.github-token }}
