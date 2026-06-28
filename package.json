@@ -18,6 +18,8 @@
 		"semantic-release-export-data": "^1.2.0"
 	},
 	"overrides": {
-		"undici": ">=6.27.0"
+		"@semantic-release/npm": {
+			"undici": ">=6.27.0"
+		}
 	}
 }
