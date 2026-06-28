@@ -1,3 +1,13 @@
+## [1.186.0](https://github.com/stairwaytowonderland/node-semantic-release/compare/v1.185.0...v1.186.0) (2026-06-28)
+
+### ✨ Features
+
+* updates ([eb2e10f](https://github.com/stairwaytowonderland/node-semantic-release/commit/eb2e10f9d126043916a79846a9744c7814d0a8b3))
+
+### 🔧 Chores
+
+* **deps:** bump undici from 6.26.0 to 7.28.0 ([#5](https://github.com/stairwaytowonderland/node-semantic-release/issues/5)) ([fb2a323](https://github.com/stairwaytowonderland/node-semantic-release/commit/fb2a32334963e83c5709a6225cf7bb64b6d81e78))
+
 ## [1.185.0](https://github.com/stairwaytowonderland/node-semantic-release/compare/v1.184.0...v1.185.0) (2026-06-28)
 
 ### ✨ Features
