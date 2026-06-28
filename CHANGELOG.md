@@ -1,3 +1,15 @@
+## [1.185.0](https://github.com/stairwaytowonderland/node-semantic-release/compare/v1.184.0...v1.185.0) (2026-06-28)
+
+### ✨ Features
+
+* updates ([43a2e4f](https://github.com/stairwaytowonderland/node-semantic-release/commit/43a2e4f3d6bd8738c8b5bbc94b98ffbd0dbd6138))
+
+### 🔧 Chores
+
+* update dependabot ([bfb95b0](https://github.com/stairwaytowonderland/node-semantic-release/commit/bfb95b0a1f572bdf22cf89dd8cf7635d269c7812))
+* update dependabot ([d1d5f00](https://github.com/stairwaytowonderland/node-semantic-release/commit/d1d5f00227f9ed0230799304425c88d73a17a457))
+* update dependabot ([81c0fd2](https://github.com/stairwaytowonderland/node-semantic-release/commit/81c0fd23b3427dc25d72ce59ca1e62dd58432acb))
+
 ## [1.184.0](https://github.com/stairwaytowonderland/node-semantic-release/compare/v1.183.0...v1.184.0) (2026-06-28)
 
 ### ✨ Features
