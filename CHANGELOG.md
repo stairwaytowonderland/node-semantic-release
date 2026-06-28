@@ -1,3 +1,9 @@
+## [1.186.1](https://github.com/stairwaytowonderland/node-semantic-release/compare/v1.186.0...v1.186.1) (2026-06-28)
+
+### 🔧 Chores
+
+* **deps:** test patch ([38bc5b8](https://github.com/stairwaytowonderland/node-semantic-release/commit/38bc5b874d12c608b5f20938269911a5ad052a33))
+
 ## [1.186.0](https://github.com/stairwaytowonderland/node-semantic-release/compare/v1.185.0...v1.186.0) (2026-06-28)
 
 ### ✨ Features
