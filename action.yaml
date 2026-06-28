@@ -1,7 +1,7 @@
 name: Node Semantic Release
 description: >
   Builds the project with npm, runs semantic-release, and base64-encodes the
-  release notes for safe transport
+  release notes for safe transport.
 author: stairwaytowonderland
 inputs:
   github-token:
