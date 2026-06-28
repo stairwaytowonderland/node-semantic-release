@@ -12,7 +12,7 @@ registries:
     type: npm-registry
     url: https://npm.pkg.github.com
     token: ${{ secrets.GH_PAT_DEPENDABOT }}
-    replaces-base: true
+    # replaces-base: true
 
   # For a registry type: npm-registry, Dependabot's strict schema requires either a token or a username/password combination.
   # It throws a validation error if they are missing, even if the registry is public.
