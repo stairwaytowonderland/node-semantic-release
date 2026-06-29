@@ -6,23 +6,22 @@
 	"scripts": {
 		"clean": "rm -rf node_modules package-lock.json && npm cache clean --force",
 		"install:safe": "npm install --legacy-peer-deps --node-gyp=./node_modules/.bin/node-gyp",
-		"clean:install:safe": "npm run clean && npm run install:safe",
+		"clean-install:safe": "npm run clean && npm run install:safe",
 		"build": "echo 'Nothing to build'"
 	},
 	"dependencies": {
 		"@semantic-release/changelog": "^6.0.3",
 		"@semantic-release/git": "^10.0.1",
-		"@semantic-release/github": "^12.0.8",
-		"@semantic-release/npm": "^13.1.5",
 		"conventional-changelog-conventionalcommits": "^9.3.1",
-		"node-gyp": "^12.4.0",
 		"semantic-release": "^25.0.5",
 		"semantic-release-export-data": "^1.2.0"
 	},
 	"overrides": {
-		"undici": ">=7.28.0 <8.0.0",
 		"node-gyp": {
 			"undici": ">=6.27.0 <7.0.0"
+		},
+		"@semantic-release/github": {
+			"undici": ">=7.28.0 <8.0.0"
 		},
 		"@actions/http-client": {
 			"undici": ">=6.27.0 <7.0.0"

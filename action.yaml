@@ -151,9 +151,7 @@ runs:
     - name: Install dependencies
       if: inputs.publish != 'true'
       shell: bash
-      # run: npm ci
-      # run: rm -f package-lock.json && npm install --legacy-peer-deps --node-gyp=./node_modules/.bin/node-gyp
-      run: npm run clean:install:safe
+      run: npm ci
 
     - name: Build
       if: inputs.publish != 'true'
