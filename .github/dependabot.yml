@@ -34,8 +34,8 @@ updates:
       # interval: 'daily'
       interval: 'weekly'
     commit-message:
-      prefix: 'ci'
-      include: 'scope' # Automatically appends "(deps)" -> ci(deps):
+      prefix: 'build'
+      include: 'scope' # Automatically appends "(deps)" -> build(deps):
     # labels: ['dependencies', 'github_actions']
     groups:
       github-actions:
@@ -54,7 +54,7 @@ updates:
       interval: 'weekly'
     commit-message:
       prefix: 'chore'
-      include: 'scope' # Automatically appends "(deps)" -> ci(deps):
+      include: 'scope' # Automatically appends "(deps)" -> chore(deps):
     # labels: ['dependencies', 'github_actions']
     groups:
       github-actions:

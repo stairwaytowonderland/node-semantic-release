@@ -15,12 +15,24 @@ inputs:
   build-only:
     description: Run the build step but skip the release step (for testing).
     required: false
+  build-task:
+    description: >
+      The npm script to run for the build step (e.g. "build" or "build:prod").
+      If not specified, the default "build" script will be used.
+    required: false
+    default: 'build'
   dry-run:
     description: Run semantic-release in dry-run mode (for testing).
     required: false
   typecheck:
     description: Run typechecking but skip the release step (for testing).
     required: false
+  typecheck-task:
+    description: >
+      The npm script to run for the typechecking step (e.g. "typecheck" or "typecheck:strict").
+      If not specified, the default "typecheck" script will be used.
+    required: false
+    default: 'typecheck'
   changelog-file:
     description: Path to the generated changelog file to commit when using manual-tag mode.
     required: false
@@ -156,12 +168,23 @@ runs:
     - name: Build
       if: inputs.publish != 'true'
       shell: bash
-      run: npm run build
+      env:
+        BUILD_TASK: ${{ inputs.build-task || 'build' }}
+      run: npm run $BUILD_TASK
 
     - name: Type check
       if: inputs.publish != 'true' && inputs.typecheck == 'true'
       shell: bash
-      run: npm run typecheck
+      env:
+        TYPECHECK_TASK: ${{ inputs.typecheck-task }}
+      run: |
+        if [ -n "$TYPECHECK_TASK" ]; then
+          echo "::notice::Running type checking with npm script '$TYPECHECK_TASK'."
+          npm run $TYPECHECK_TASK
+        else
+          echo "::notice::Running type checking with direct command 'npx tsc --noEmit'."
+          npx tsc --noEmit
+        fi
 
     - name: Check 'semantic-release-export-data' plugin
       if: inputs.publish != 'true' && inputs.build-only != 'true'
