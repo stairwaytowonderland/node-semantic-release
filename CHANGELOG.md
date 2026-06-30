@@ -1,3 +1,11 @@
+## [1.189.1](https://github.com/stairwaytowonderland/node-semantic-release/compare/v1.189.0...v1.189.1) (2026-06-30)
+
+### 🔧 Chores
+
+* **deps:** bump actions/checkout from 6 to 7 in /.github/workflows in the github-actions group across 1 directory ([#6](https://github.com/stairwaytowonderland/node-semantic-release/issues/6)) ([ce7dcca](https://github.com/stairwaytowonderland/node-semantic-release/commit/ce7dcca3e8035ed88c32c0f8e05be1d539c19b15))
+* update dependabot ([5ceaa87](https://github.com/stairwaytowonderland/node-semantic-release/commit/5ceaa87aaaff501ee9db9966e52aac60e47ae7c0))
+* update dependabot ([a0842f2](https://github.com/stairwaytowonderland/node-semantic-release/commit/a0842f274740fdd5f78c0f9c7f9595d88f778822))
+
 ## [1.189.0](https://github.com/stairwaytowonderland/node-semantic-release/compare/v1.188.0...v1.189.0) (2026-06-30)
 
 ### ✨ Features
