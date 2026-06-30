@@ -43,7 +43,7 @@ jobs:
       # Checkout at the input tag so setuptools-scm sees it and stamps the
       # correct version into the wheel metadata.
       - name: Checkout release tag
-        uses: actions/checkout@v6
+        uses: actions/checkout@v7
         with:
           ref: ${{ steps.vars.outputs.tag }}
           persist-credentials: false
