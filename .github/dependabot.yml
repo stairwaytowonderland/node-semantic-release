@@ -53,7 +53,7 @@ updates:
     rebase-strategy: 'auto'
     assignees: ['andrewhaller']
   - package-ecosystem: 'github-actions'
-    directory: '.github/**'
+    directory: '.github/**/**'
     # Prevent Dependabot from checking workflows inside these paths
     exclude-paths:
       - '.github/actions/**'
