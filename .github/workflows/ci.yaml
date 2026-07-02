@@ -53,3 +53,13 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: nowactions/update-majorver@v1
+
+  # normalize-majorver:
+  #   name: Normalize Major Version Tag
+  #   needs: [publish]
+  #   runs-on: ubuntu-latest
+  #   permissions:
+  #     contents: write
+  #   steps:
+  #     - name: Normalize Major Version Tag
+  #       uses: stairwaytowonderland/normalize-majorver@v1
