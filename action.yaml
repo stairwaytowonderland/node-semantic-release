@@ -111,6 +111,9 @@ outputs:
   release-published:
     description: "'true' if the release was published."
     value: ${{ steps.publish.outputs.published }}
+  is-first-release-tag:
+    description: "'true' if this is the first release tag in the repository."
+    value: ${{ steps.first-release-tag.outputs.is-first-release-tag }}
 
 runs:
   using: composite
@@ -145,6 +148,24 @@ runs:
         else
           echo "has-lock-file=false" >> "$GITHUB_OUTPUT"
         fi
+
+    - name: Detect first release tag
+      id: first-release-tag
+      if: ${{ steps.set-vars.outputs.is-tag-create-workflow == 'true' }}
+      uses: actions/github-script@v9
+      with:
+        script: |
+          const refName = process.env.GITHUB_REF_NAME
+          const { owner, repo } = context.repo
+          const { data: tags } = await github.rest.repos.listTags({
+            owner,
+            repo,
+            per_page: 2,
+          })
+
+          const isFirstReleaseTag = tags.length === 1 && tags[0]?.name === refName
+          core.info(`first release tag check: tags=${tags.map(t => t.name).join(', ')}`)
+          core.setOutput('is-first-release-tag', isFirstReleaseTag ? 'true' : 'false')
 
     - name: Setup Node.js with cache
       if: inputs.publish != 'true'
