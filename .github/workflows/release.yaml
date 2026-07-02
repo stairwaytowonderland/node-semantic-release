@@ -24,6 +24,22 @@ on:
       github-token:
         description: 'GitHub Personal Access Token with repo scope for creating releases.'
         required: false
+    outputs:
+      new-release-published:
+        description: 'Whether a new release was published.'
+        value: ${{ jobs.release.outputs.new-release-published }}
+      new-release-version:
+        description: 'The version of the new release.'
+        value: ${{ jobs.release.outputs.new-release-version }}
+      new-release-git-tag:
+        description: 'The git tag of the new release.'
+        value: ${{ jobs.release.outputs.new-release-git-tag }}
+      new-release-notes:
+        description: 'The release notes of the new release.'
+        value: ${{ jobs.release.outputs.new-release-notes }}
+      new-release-notes-base64:
+        description: 'The base64-encoded release notes of the new release.'
+        value: ${{ jobs.release.outputs.new-release-notes-base64 }}
 
 jobs:
   release:
