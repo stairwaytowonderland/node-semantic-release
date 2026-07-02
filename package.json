@@ -1,6 +1,6 @@
 {
 	"name": "node-semantic-release",
-	"version": "1.189.1",
+	"version": "1.190.0",
 	"description": "A semantic-release plugin to automate releases from a repository root.",
 	"private": true,
 	"scripts": {
