@@ -1,3 +1,9 @@
+## [1.193.0](https://github.com/stairwaytowonderland/node-semantic-release/compare/v1.192.0...v1.193.0) (2026-07-03)
+
+### ✨ Features
+
+* remove is-first-release-tag ([f210a51](https://github.com/stairwaytowonderland/node-semantic-release/commit/f210a51d58961f446565736f7bfcfd3d8f18a882))
+
 ## [1.192.0](https://github.com/stairwaytowonderland/node-semantic-release/compare/v1.191.0...v1.192.0) (2026-07-02)
 
 ### ✨ Features
