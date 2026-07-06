@@ -17,6 +17,23 @@ on:
         description: 'GitHub Personal Access Token with repo scope for creating releases.'
         required: false
 
+    outputs:
+      release-url:
+        description: 'The URL of the published release.'
+        value: ${{ jobs.publish.outputs.release-url }}
+      release-tag:
+        description: 'The tag of the published release.'
+        value: ${{ jobs.publish.outputs.release-tag }}
+      release-sha:
+        description: 'The commit SHA of the published release.'
+        value: ${{ jobs.publish.outputs.release-sha }}
+      release-notes-b64:
+        description: 'The base64-encoded release notes of the published release.'
+        value: ${{ jobs.publish.outputs.release-notes-b64 }}
+      release-published:
+        description: 'Whether a new release was published.'
+        value: ${{ jobs.publish.outputs.release-published }}
+
 jobs:
   publish:
     name: Publish GitHub Release

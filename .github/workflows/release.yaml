@@ -25,9 +25,9 @@ on:
         description: 'GitHub Personal Access Token with repo scope for creating releases.'
         required: false
     outputs:
-      new-release-published:
+      new-version-released:
         description: 'Whether a new release was published.'
-        value: ${{ jobs.release.outputs.new-release-published }}
+        value: ${{ jobs.release.outputs.new-version-released }}
       new-release-version:
         description: 'The version of the new release.'
         value: ${{ jobs.release.outputs.new-release-version }}
@@ -53,7 +53,7 @@ jobs:
       pull-requests: write
 
     outputs:
-      new-release-published: ${{ steps.release.outputs.new-release-published }}
+      new-version-released: ${{ steps.release.outputs.new-version-released }}
       new-release-version: ${{ steps.release.outputs.new-release-version }}
       new-release-git-tag: ${{ steps.release.outputs.new-release-git-tag }}
       new-release-notes: ${{ steps.release.outputs.new-release-notes }}
@@ -119,14 +119,14 @@ jobs:
           additional-assets-json: ${{ inputs.additional-assets-json }}
 
       - name: Release failed
-        if: steps.release.outputs.new-release-published != 'true' && inputs.fail-on-no-release
+        if: steps.release.outputs.new-version-released != 'true' && inputs.fail-on-no-release
         uses: actions/github-script@v9
         with:
           script: |
             core.setFailed('Release failed')
 
       - name: Dispatch Publish workflow
-        if: steps.release.outputs.new-release-published == 'true' && steps.vars.outputs.is-dispatch-workflow == 'true'
+        if: steps.release.outputs.new-version-released == 'true' && steps.vars.outputs.is-dispatch-workflow == 'true'
         uses: stairwaytowonderland/simple-workflow-dispatch@main
         with:
           workflow: ${{ inputs.dispatch-workflow }}
