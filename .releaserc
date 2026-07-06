@@ -73,7 +73,13 @@
 						},
 						{
 							"type": "chore",
-							"section": "🔧 Chores"
+							"scope": "release",
+							"hidden": true
+						},
+						{
+							"type": "chore",
+							"section": "🔧 Chores",
+							"hidden": false
 						},
 						{
 							"type": "style",
