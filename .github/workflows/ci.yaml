@@ -42,7 +42,7 @@ jobs:
     permissions:
       contents: read
     with:
-      publish: ${{ inputs.publish }}
+      publish: ${{ inputs.publish == true }}
 
   release:
     name: Release
@@ -51,8 +51,8 @@ jobs:
     uses: ./.github/workflows/release.yaml
     secrets: inherit
     with:
-      # dispatch-workflow: publish.yaml
-      fail-on-no-release: ${{ inputs.fail-on-no-release || false }}
+      dispatch-workflow: ${{ needs.meta.outputs.has-release-tags != 'true' && 'ci.yaml' || '' }}
+      fail-on-no-release: ${{ inputs.fail-on-no-release == true }}
 
   publish:
     name: Publish
