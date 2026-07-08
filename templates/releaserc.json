@@ -35,10 +35,6 @@
 					{
 						"scope": "no-release",
 						"release": false
-					},
-					{
-						"scope": "no-release",
-						"release": false
 					}
 				]
 			}
