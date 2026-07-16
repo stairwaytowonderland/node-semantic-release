@@ -38,7 +38,7 @@ permissions:
 jobs:
   meta:
     name: Meta
-    uses: stairwaytowonderland/actions/.github/workflows/ci-meta.yaml@v1
+    uses: stairwaytowonderland/.github/.github/workflows/ci-meta.yaml@v1
     permissions:
       contents: read
     with:
@@ -69,6 +69,6 @@ jobs:
     name: Normalize Major Version Tag
     needs: [publish]
     if: (needs.publish.outputs.release-published == 'true' && github.event_name == 'workflow_dispatch') || startsWith(github.ref, 'refs/tags/v')
-    uses: stairwaytowonderland/actions/.github/workflows/normalize-majorver.yaml@v1
+    uses: stairwaytowonderland/.github/.github/workflows/normalize-majorver.yaml@v1
     permissions:
       contents: write
