@@ -4,13 +4,6 @@
 	],
 	"tagFormat": "v${version}",
 	"plugins": [
-		"semantic-release-export-data",
-		[
-			"@semantic-release/changelog",
-			{
-				"changelogFile": "CHANGELOG.md"
-			}
-		],
 		[
 			"@semantic-release/commit-analyzer",
 			{
@@ -91,6 +84,13 @@
 						}
 					]
 				}
+			}
+		],
+		"semantic-release-export-data",
+		[
+			"@semantic-release/changelog",
+			{
+				"changelogFile": "CHANGELOG.md"
 			}
 		],
 		[
