@@ -270,10 +270,14 @@ runs:
         git config --global commit.cleanup verbatim
         git config --global user.name "$COMMIT_AUTHOR"
         git config --global user.email "$COMMIT_EMAIL"
+
         # git config --global user.name "github-actions[bot]"
         # git config --global user.email "41898282+github-actions[bot]@users.noreply.github.com"
         # git config --global user.name "semantic-release-bot"
         # git config --global user.email "semantic-release-bot@martynus.net"
+
+        git config --global commit.gpgsign true
+        git config --global tag.gpgsign true
 
         git config --global core.excludesfile "$EXCLUDE_FILE"
         echo "$NOTES_FILE" >> "$EXCLUDE_FILE"
@@ -387,7 +391,9 @@ runs:
       if: inputs.publish == 'true' && inputs.notes-b64 == ''
       id: parse
       shell: bash
-      run: git tag -l --format='%(contents)' "$TAG" > release-notes.md
+      # run: git tag -l --format='%(contents)' "$TAG" > release-notes.md
+      # https://stackoverflow.com/questions/79780064/how-to-show-contents-of-annotated-tag-without-the-signature
+      run: git tag --list --format=$'%(subject)%(if)%(contents:body)%(then)\n\n%(contents:body)%(end)' "$TAG" > release-notes.md
       env:
         TAG: ${{ steps.verify.outputs.tag }}
 
