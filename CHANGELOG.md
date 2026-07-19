@@ -1,3 +1,9 @@
+## [1.198.0](https://github.com/stairwaytowonderland/node-semantic-release/compare/v1.197.0...v1.198.0) (2026-07-19)
+
+### ✨ Features
+
+* comment out gpgsign ([ed78977](https://github.com/stairwaytowonderland/node-semantic-release/commit/ed78977a32cc557fb7ba1bd2304bf2a5b05584eb))
+
 ## [1.197.0](https://github.com/stairwaytowonderland/node-semantic-release/compare/v1.196.0...v1.197.0) (2026-07-19)
 
 ### ✨ Features
