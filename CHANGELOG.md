@@ -1,3 +1,13 @@
+## [1.197.0](https://github.com/stairwaytowonderland/node-semantic-release/compare/v1.196.0...v1.197.0) (2026-07-19)
+
+### ✨ Features
+
+* listing tags without showing signature ([da9511e](https://github.com/stairwaytowonderland/node-semantic-release/commit/da9511eab5897f5cf512c891655fc49ded7f5116))
+
+### 🔧 Chores
+
+* update reuseable workflow references ([7f8881e](https://github.com/stairwaytowonderland/node-semantic-release/commit/7f8881e137a39cbc74caa4bad336d4b9f05b6245))
+
 ## [1.196.0](https://github.com/stairwaytowonderland/node-semantic-release/compare/v1.195.0...v1.196.0) (2026-07-08)
 
 ### ✨ Features
