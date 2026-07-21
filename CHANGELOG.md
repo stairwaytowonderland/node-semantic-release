@@ -1,3 +1,9 @@
+## [1.201.0](https://github.com/stairwaytowonderland/node-semantic-release/compare/v1.200.0...v1.201.0) (2026-07-21)
+
+### ✨ Features
+
+* update LICENSE ([571c0fe](https://github.com/stairwaytowonderland/node-semantic-release/commit/571c0fe16d795ce2f0031bbe26028df08335ec23))
+
 ## [1.200.0](https://github.com/stairwaytowonderland/node-semantic-release/compare/v1.199.0...v1.200.0) (2026-07-19)
 
 ### ✨ Features
