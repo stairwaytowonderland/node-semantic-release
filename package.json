@@ -18,9 +18,7 @@
 		"semantic-release-export-data": "^1.2.0"
 	},
 	"resolutions": {
-		"glob": "14.0.3",
-		"ip-address": "10.31.0",
-		"minimatch": "11.0.3"
+		"ip-address": "10.31.0"
 	},
 	"overrides": {
 		"undici": "^6.29.1",
