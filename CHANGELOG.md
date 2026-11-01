@@ -1,3 +1,9 @@
+## [1.211.0](https://github.com/stairwaytowonderland/node-semantic-release/compare/v1.210.0...v1.211.0) (2026-11-01)
+
+### ✨ Features
+
+* testing updates ([caff221](https://github.com/stairwaytowonderland/node-semantic-release/commit/caff2214997851e15a8a1e573a12bed293f2e983))
+
 ## [1.210.0](https://github.com/stairwaytowonderland/node-semantic-release/compare/v1.209.0...v1.210.0) (2026-11-01)
 
 ### ✨ Features
