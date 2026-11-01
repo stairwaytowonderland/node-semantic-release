@@ -57,6 +57,22 @@ jobs:
       fail-on-no-release: ${{ inputs.fail-on-no-release == true }}
     secrets: inherit
 
+  release-outputs:
+    name: Release Outputs
+    needs: [release]
+    runs-on: ubuntu-latest
+    # if: needs.release.outputs.new-version-released == 'true'
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+
+      - name: Get Release Outputs
+        id: release-outputs
+        env:
+          RELEASE_OUTPUTS: ${{ toJson(needs.release.outputs) }}
+        run: |
+          echo "Release Outputs: $RELEASE_OUTPUTS"
+
   publish:
     name: Publish
     needs: [release]
