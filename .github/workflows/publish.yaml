@@ -107,7 +107,6 @@ jobs:
         id: publish
         uses: ./
         with:
-          publish: true
           github-token: ${{ steps.resolve-auth.outputs.generate-app-token == 'true' && steps.generate-token.outputs.token || secrets.github-token }}
           notes-b64: ${{ inputs.notes-b64 }}
           tag: ${{ steps.vars.outputs.tag }}
