@@ -63,11 +63,13 @@ jobs:
     # if: needs.meta.outputs.is-publish-workflow == 'true'
     if: needs.release.outputs.new-release-published == 'true'
     uses: ./.github/workflows/publish.yaml
-
     permissions:
       contents: write
     with:
-      tag: ${{ github.ref_name }}
+      # tag: ${{ github.ref_name }}
+      tag: ${{ needs.release.outputs.new-release-git-tag }}
+      # notes-b64: ${{ inputs.notes-b64 }}
+      notes-b64: ${{ needs.release.outputs.new-release-notes-base64 }}
     secrets: inherit
 
   normalize-majorver:
