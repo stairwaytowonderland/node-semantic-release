@@ -25,9 +25,9 @@ on:
         description: 'GitHub Personal Access Token with repo scope for creating releases.'
         required: false
     outputs:
-      new-version-released:
+      new-release-published:
         description: 'Whether a new release was published.'
-        value: ${{ jobs.release.outputs.new-version-released }}
+        value: ${{ jobs.release.outputs.new-release-published }}
       new-release-version:
         description: 'The version of the new release.'
         value: ${{ jobs.release.outputs.new-release-version }}
@@ -53,7 +53,7 @@ jobs:
       pull-requests: write
 
     outputs:
-      new-version-released: ${{ steps.release.outputs.new-version-released }}
+      new-release-published: ${{ steps.release.outputs.new-release-published }}
       new-release-version: ${{ steps.release.outputs.new-release-version }}
       new-release-git-tag: ${{ steps.release.outputs.new-release-git-tag }}
       new-release-notes: ${{ steps.release.outputs.new-release-notes }}
