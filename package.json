@@ -18,7 +18,7 @@
 		"semantic-release-export-data": "^1.2.0"
 	},
 	"resolutions": {
-		"ip-address": "^10.31.0"
+		"ip-address": "10.31.0"
 	},
 	"overrides": {
 		"undici": "^6.29.1",
