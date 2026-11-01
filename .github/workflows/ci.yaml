@@ -33,18 +33,18 @@ permissions:
 # 'Fine-grained token' repo permissions: Contents
 
 jobs:
-  meta:
-    name: Meta
-    permissions:
-      contents: read
-    uses: stairwaytowonderland/.github/.github/workflows/ci-meta.yaml@v1
-    with:
-      publish: ${{ inputs.publish == true }}
+  # meta:
+  #   name: Meta
+  #   permissions:
+  #     contents: read
+  #   uses: stairwaytowonderland/.github/.github/workflows/ci-meta.yaml@v1
+  #   with:
+  #     publish: ${{ inputs.publish == true }}
 
   release:
     name: Release
-    needs: [meta]
-    if: needs.meta.outputs.is-release-workflow == 'true'
+    # needs: [meta]
+    # if: needs.meta.outputs.is-release-workflow == 'true'
     permissions:
       actions: write
       contents: write
@@ -53,14 +53,15 @@ jobs:
 
     uses: ./.github/workflows/release.yaml
     with:
-      dispatch-workflow: ${{ needs.meta.outputs.has-release-tags != 'true' && 'ci.yaml' || '' }}
+      dispatch-workflow: ''
       fail-on-no-release: ${{ inputs.fail-on-no-release == true }}
     secrets: inherit
 
   publish:
     name: Publish
-    needs: [meta]
-    if: needs.meta.outputs.is-publish-workflow == 'true'
+    needs: [release]
+    # if: needs.meta.outputs.is-publish-workflow == 'true'
+    if: needs.release.outputs.new-version-released == 'true'
     uses: ./.github/workflows/publish.yaml
 
     permissions:
