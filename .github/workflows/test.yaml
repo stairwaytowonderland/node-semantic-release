@@ -1,0 +1,56 @@
+name: CI Tests
+
+on:
+  pull_request:
+    branches:
+      - main
+    paths:
+      - '.github/**'
+      - 'package*.json'
+      - 'action.y*ml'
+  # push:
+  #   branches:
+  #     - main
+  #   paths:
+  #     # - '.github/**'
+  #     - '**/src/**'
+  #     - 'package*json'
+  #     - 'action.yaml'
+  workflow_call:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  test-action:
+    name: GitHub Actions Test
+    permissions:
+      contents: read
+      actions: read
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        id: checkout
+        uses: actions/checkout@v7
+
+      - name: Test Local Action (use-project-dependencies)
+        id: test-action-with-deps
+        uses: ./
+        with:
+          dry-run: true
+          use-project-dependencies: true
+
+      - name: Test Local Action (no project dependencies)
+        id: test-action-no-deps
+        uses: ./
+        with:
+          dry-run: true
+          use-project-dependencies: false
+
+      - name: Print Output
+        id: output
+        run: |
+          echo "${{ toJSON(steps.test-action-with-deps.outputs) }}"
+          echo "${{ toJSON(steps.test-action-no-deps.outputs) }}"

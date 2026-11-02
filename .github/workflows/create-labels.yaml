@@ -1,9 +1,5 @@
 name: Create Labels
 
-concurrency:
-  group: ${{ github.workflow }}
-  cancel-in-progress: false
-
 on:
   repository_dispatch:
     types: [create-labels]
@@ -17,6 +13,13 @@ on:
       update-existing:
         description: 'Whether to update existing labels (e.g. rename, change color/description).'
         type: boolean
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ${{ github.workflow }}
+  cancel-in-progress: false
 
 jobs:
   create-labels:

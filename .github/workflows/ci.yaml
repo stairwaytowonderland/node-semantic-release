@@ -22,12 +22,12 @@ on:
         required: false
         default: false
 
+permissions:
+  contents: read
+
 concurrency:
   group: '${{ github.repository_id }}-${{ github.ref_name }}'
   cancel-in-progress: true
-
-permissions:
-  contents: read
 
 # Use PAT instead of GITHUB_TOKEN to cause semantic-release to trigger tag pipeline when tag is created.
 # 'Fine-grained token' repo permissions: Contents
@@ -41,9 +41,15 @@ jobs:
   #   with:
   #     publish: ${{ inputs.publish == true }}
 
+  test:
+    name: Test
+    permissions:
+      contents: read
+    uses: ./.github/workflows/test.yaml
+
   release:
     name: Release
-    # needs: [meta]
+    needs: [test]
     # if: needs.meta.outputs.is-release-workflow == 'true'
     permissions:
       actions: write

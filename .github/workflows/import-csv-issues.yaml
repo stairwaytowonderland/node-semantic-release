@@ -1,9 +1,5 @@
 name: Import Issues from CSV
 
-concurrency:
-  group: ${{ github.workflow }}
-  cancel-in-progress: false
-
 on:
   repository_dispatch:
     types: [create-issues]
@@ -18,6 +14,13 @@ on:
         description: 'Path (relative) to the CSV file'
         type: string
         default: 'TODO.csv'
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ${{ github.workflow }}
+  cancel-in-progress: false
 
 jobs:
   import-issues:
