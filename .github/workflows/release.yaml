@@ -89,7 +89,7 @@ jobs:
           github-token: ${{ steps.auth-token.outputs.github-token }}
           changelog-file: ${{ inputs.changelog-file }}
           additional-assets-json: ${{ inputs.additional-assets-json }}
-          use-project-dependencies: false
+          use-project-dependencies: true
 
       - name: Release failed
         if: steps.release.outputs.new-release-published != 'true' && inputs.fail-on-no-release
