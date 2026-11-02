@@ -195,12 +195,10 @@ runs:
       if: inputs.publish != 'true' && inputs.build-only != 'true'
       shell: bash
       run: |
-        if ! node -e "const {createRequire}=require('node:module'); const req=createRequire(process.env.ACTION_PACKAGE_JSON); req.resolve('semantic-release-export-data/package.json');" 2>/dev/null; then
+        if ! npm exec --prefix "$GITHUB_ACTION_PATH" -- node -e "require.resolve('semantic-release-export-data/package.json')" >/dev/null 2>&1; then
           echo "::error::semantic-release-export-data is not available from this action's dependency set."
           exit 1
         fi
-      env:
-        ACTION_PACKAGE_JSON: ${{ github.action_path }}/package.json
 
     - name: Release
       if: inputs.publish != 'true' && inputs.build-only != 'true'
