@@ -24,7 +24,7 @@ permissions:
 
 jobs:
   test-action:
-    name: GitHub Actions Test
+    name: 'GitHub Actions Test: use-project-dependencies'
     permissions:
       contents: write
       actions: read
