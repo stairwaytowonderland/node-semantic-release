@@ -195,8 +195,10 @@ runs:
       if: inputs.publish != 'true' && inputs.build-only != 'true'
       shell: bash
       run: |
-        if ! npm exec --prefix "$GITHUB_ACTION_PATH" -- node -e "require.resolve('semantic-release-export-data/package.json')" >/dev/null 2>&1; then
+        plugin_manifest="$GITHUB_ACTION_PATH/node_modules/semantic-release-export-data/package.json"
+        if [ ! -f "$plugin_manifest" ]; then
           echo "::error::semantic-release-export-data is not available from this action's dependency set."
+          echo "::error::Expected plugin manifest at: $plugin_manifest"
           exit 1
         fi
 
@@ -208,7 +210,8 @@ runs:
       #   # Force Git remote to point to the caller repository using the input token
       #   git remote set-url origin https://x-access-token:${GH_TOKEN}@github.com/${GITHUB_REPOSITORY}.git
       #   npx semantic-release ${DRY_RUN_FLAG}
-      run: npm exec --prefix "$GITHUB_ACTION_PATH" -- semantic-release ${DRY_RUN_FLAG}
+      run: |
+        "$GITHUB_ACTION_PATH/node_modules/.bin/semantic-release" ${DRY_RUN_FLAG}
       env:
         # GH_TOKEN: ${{ inputs.github-token }}
         GITHUB_TOKEN: ${{ inputs.github-token }}
