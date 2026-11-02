@@ -165,6 +165,11 @@ runs:
       shell: bash
       run: npm ci
 
+    - name: Install action release dependencies
+      if: inputs.publish != 'true' && inputs.build-only != 'true'
+      shell: bash
+      run: npm ci --prefix "$GITHUB_ACTION_PATH"
+
     - name: Build
       if: inputs.publish != 'true'
       shell: bash
@@ -190,10 +195,12 @@ runs:
       if: inputs.publish != 'true' && inputs.build-only != 'true'
       shell: bash
       run: |
-        if ! node -e "require('semantic-release-export-data')" 2>/dev/null; then
-          echo "::error::semantic-release-export-data is not installed. Add it to package.json and ensure it is listed in your semantic-release plugins (e.g. '.releaserc')."
+        if ! node -e "const {createRequire}=require('node:module'); const req=createRequire(process.env.ACTION_PACKAGE_JSON); req.resolve('semantic-release-export-data/package.json');" 2>/dev/null; then
+          echo "::error::semantic-release-export-data is not available from this action's dependency set."
           exit 1
         fi
+      env:
+        ACTION_PACKAGE_JSON: ${{ github.action_path }}/package.json
 
     - name: Release
       if: inputs.publish != 'true' && inputs.build-only != 'true'
@@ -203,7 +210,7 @@ runs:
       #   # Force Git remote to point to the caller repository using the input token
       #   git remote set-url origin https://x-access-token:${GH_TOKEN}@github.com/${GITHUB_REPOSITORY}.git
       #   npx semantic-release ${DRY_RUN_FLAG}
-      run: npx semantic-release ${DRY_RUN_FLAG}
+      run: npm exec --prefix "$GITHUB_ACTION_PATH" -- semantic-release ${DRY_RUN_FLAG}
       env:
         # GH_TOKEN: ${{ inputs.github-token }}
         GITHUB_TOKEN: ${{ inputs.github-token }}
