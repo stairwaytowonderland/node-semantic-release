@@ -68,19 +68,20 @@ The publish job only needs `contents: write`.
 > notes, then manually commits the specified assets (`changelog-file`, `additional-assets-json`) and pushes
 > an annotated git tag. This is useful for debugging.
 
-| Name                     | Description                                                                                                                     | Required | Default                              |
-| ------------------------ | ------------------------------------------------------------------------------------------------------------------------------- | -------- | ------------------------------------ |
-| `node-version`           | Node.js version to use.                                                                                                         | No       | `24`                                 |
-| `github-token`           | GitHub token passed to semantic-release. Requires `contents: write` and `issues: write` permissions (or a PAT with repo scope). | No¹      | `${{ github.token }}`                |
-| `build-only`             | Run the build step but skip the release step. Useful for CI checks.                                                             | No       | `''`                                 |
-| `typecheck`              | Run `npm run typecheck` after the build and skip the release step. Useful for CI checks.                                        | No       | `''`                                 |
-| `dry-run`                | Run semantic-release in `--dry-run` mode. No tag or release is created.                                                         | No       | `''`                                 |
-| `manual-tag`             | Compute the next version with semantic-release (dry-run), then commit release assets and push the tag manually. See note below. | No       | `''`                                 |
-| `changelog-file`         | Path to the changelog file to commit when using `manual-tag` mode (e.g. `CHANGELOG.md`).                                        | No²      | `CHANGELOG.md`                       |
-| `additional-assets-json` | JSON array of additional files to commit when using `manual-tag` mode (e.g. `["package.json","package-lock.json"]`).            | No²      | ["package.json","package-lock.json"] |
-| `commit-author`          | Git author name for commits made by the action when using `manual-tag` mode.                                                    | No²      | `semantic-release-bot`               |
-| `commit-email`           | Git author email for commits made by the action when using `manual-tag` mode.                                                   | No²      | `semantic-release-bot@martynus.net`  |
-| `commit-prefix`          | Prefix for the release commit message when using `manual-tag` mode.                                                             | No²      | `chore(release):`                    |
+| Name                       | Description                                                                                                                              | Required | Default                              |
+| -------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------- | -------- | ------------------------------------ |
+| `node-version`             | Node.js version to use.                                                                                                                  | No       | `24`                                 |
+| `use-project-dependencies` | If `true`, run semantic-release from the caller project dependencies. If not `true`, run semantic-release from this action dependencies. | No       | `true`                               |
+| `github-token`             | GitHub token passed to semantic-release. Requires `contents: write` and `issues: write` permissions (or a PAT with repo scope).          | No¹      | `${{ github.token }}`                |
+| `build-only`               | Run the build step but skip the release step. Useful for CI checks.                                                                      | No       | `''`                                 |
+| `typecheck`                | Run `npm run typecheck` after the build and skip the release step. Useful for CI checks.                                                 | No       | `''`                                 |
+| `dry-run`                  | Run semantic-release in `--dry-run` mode. No tag or release is created.                                                                  | No       | `''`                                 |
+| `manual-tag`               | Compute the next version with semantic-release (dry-run), then commit release assets and push the tag manually. See note below.          | No       | `''`                                 |
+| `changelog-file`           | Path to the changelog file to commit when using `manual-tag` mode (e.g. `CHANGELOG.md`).                                                 | No²      | `CHANGELOG.md`                       |
+| `additional-assets-json`   | JSON array of additional files to commit when using `manual-tag` mode (e.g. `["package.json","package-lock.json"]`).                     | No²      | ["package.json","package-lock.json"] |
+| `commit-author`            | Git author name for commits made by the action when using `manual-tag` mode.                                                             | No²      | `semantic-release-bot`               |
+| `commit-email`             | Git author email for commits made by the action when using `manual-tag` mode.                                                            | No²      | `semantic-release-bot@martynus.net`  |
+| `commit-prefix`            | Prefix for the release commit message when using `manual-tag` mode.                                                                      | No²      | `chore(release):`                    |
 
 ### Publish mode inputs
 

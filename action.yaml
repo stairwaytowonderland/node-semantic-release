@@ -12,6 +12,12 @@ inputs:
     description: Node.js version to use.
     required: false
     default: '24'
+  use-project-dependencies:
+    description: >
+      If 'true', run semantic-release from the caller project's dependencies.
+      Otherwise, run semantic-release from this action's dependencies.
+    required: false
+    default: 'true'
   build-only:
     description: Run the build step but skip the release step (for testing).
     required: false
@@ -166,7 +172,7 @@ runs:
       run: npm ci
 
     - name: Install action release dependencies
-      if: inputs.publish != 'true' && inputs.build-only != 'true'
+      if: inputs.publish != 'true' && inputs.build-only != 'true' && inputs.use-project-dependencies != 'true'
       shell: bash
       run: npm ci --prefix "$GITHUB_ACTION_PATH"
 
@@ -195,12 +201,21 @@ runs:
       if: inputs.publish != 'true' && inputs.build-only != 'true'
       shell: bash
       run: |
-        plugin_manifest="$GITHUB_ACTION_PATH/node_modules/semantic-release-export-data/package.json"
-        if [ ! -f "$plugin_manifest" ]; then
-          echo "::error::semantic-release-export-data is not available from this action's dependency set."
-          echo "::error::Expected plugin manifest at: $plugin_manifest"
-          exit 1
+        if [ "$USE_PROJECT_DEPENDENCIES" = "true" ]; then
+          if ! node -e "require('semantic-release-export-data')" 2>/dev/null; then
+            echo "::error::semantic-release-export-data is not installed in the caller project's dependencies."
+            exit 1
+          fi
+        else
+          plugin_manifest="$GITHUB_ACTION_PATH/node_modules/semantic-release-export-data/package.json"
+          if [ ! -f "$plugin_manifest" ]; then
+            echo "::error::semantic-release-export-data is not available from this action's dependency set."
+            echo "::error::Expected plugin manifest at: $plugin_manifest"
+            exit 1
+          fi
         fi
+      env:
+        USE_PROJECT_DEPENDENCIES: ${{ inputs.use-project-dependencies }}
 
     - name: Release
       if: inputs.publish != 'true' && inputs.build-only != 'true'
@@ -211,11 +226,16 @@ runs:
       #   git remote set-url origin https://x-access-token:${GH_TOKEN}@github.com/${GITHUB_REPOSITORY}.git
       #   npx semantic-release ${DRY_RUN_FLAG}
       run: |
-        "$GITHUB_ACTION_PATH/node_modules/.bin/semantic-release" ${DRY_RUN_FLAG}
+        if [ "$USE_PROJECT_DEPENDENCIES" = "true" ]; then
+          npx semantic-release ${DRY_RUN_FLAG}
+        else
+          "$GITHUB_ACTION_PATH/node_modules/.bin/semantic-release" ${DRY_RUN_FLAG}
+        fi
       env:
         # GH_TOKEN: ${{ inputs.github-token }}
         GITHUB_TOKEN: ${{ inputs.github-token }}
         DRY_RUN_FLAG: ${{ inputs.manual-tag == 'true' || inputs.dry-run == 'true' && '--dry-run' || '' }}
+        USE_PROJECT_DEPENDENCIES: ${{ inputs.use-project-dependencies }}
 
     - name: Set notes file
       if: steps.release.outputs.new-release-published == 'true'
