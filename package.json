@@ -5,10 +5,11 @@
 	"private": true,
 	"scripts": {
 		"preinstall": "npx npm-force-resolutions",
+		"install:safe": "npm install --legacy-peer-deps --node-gyp=./node_modules/.bin/node-gyp",
 		"clean": "rm -rf node_modules dist package-lock.json",
 		"clean-cache": "npm cache clean --force",
-		"install:safe": "npm install --legacy-peer-deps --node-gyp=./node_modules/.bin/node-gyp",
-		"build": "echo 'Nothing to build'"
+		"build": "echo 'Nothing to build'",
+		"reset": "npm run clean && npm install --ignore-scripts --package-lock-only && npm install"
 	},
 	"dependencies": {
 		"@semantic-release/changelog": "^6.0.3",
