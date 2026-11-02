@@ -47,6 +47,7 @@ jobs:
       contents: read
       actions: read
     uses: ./.github/workflows/test.yaml
+    secrets: inherit
 
   release:
     name: Release
