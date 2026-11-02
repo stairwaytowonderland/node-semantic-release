@@ -29,28 +29,17 @@ jobs:
       contents: write
       actions: read
     runs-on: ubuntu-latest
-
+    strategy:
+      matrix:
+        use-project-dependencies: [true, false]
     steps:
       - name: Checkout repository
         id: checkout
         uses: actions/checkout@v7
 
-      - name: Test Local Action (use-project-dependencies)
-        id: test-action-with-deps
+      - name: Test Local Action
+        id: test-action
         uses: ./
         with:
           dry-run: true
-          use-project-dependencies: true
-
-      - name: Test Local Action (no project dependencies)
-        id: test-action-no-deps
-        uses: ./
-        with:
-          dry-run: true
-          use-project-dependencies: false
-
-      - name: Print Output
-        id: output
-        run: |
-          echo "${{ toJSON(steps.test-action-with-deps.outputs) }}"
-          echo "${{ toJSON(steps.test-action-no-deps.outputs) }}"
+          use-project-dependencies: ${{ matrix.use-project-dependencies }}
