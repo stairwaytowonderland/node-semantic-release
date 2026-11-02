@@ -45,6 +45,7 @@ jobs:
     name: Test
     permissions:
       contents: read
+      actions: read
     uses: ./.github/workflows/test.yaml
 
   release:
