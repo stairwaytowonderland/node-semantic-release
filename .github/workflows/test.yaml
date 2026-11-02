@@ -6,16 +6,17 @@ on:
       - main
     paths:
       - '.github/**'
+      - '**/src/**'
       - 'package*.json'
       - 'action.y*ml'
   # push:
   #   branches:
   #     - main
   #   paths:
-  #     # - '.github/**'
+  #     - '.github/**'
   #     - '**/src/**'
-  #     - 'package*json'
-  #     - 'action.yaml'
+  #     - 'package*.json'
+  #     - 'action.y*ml'
   workflow_call:
   workflow_dispatch:
 
