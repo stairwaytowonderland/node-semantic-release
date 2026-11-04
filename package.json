@@ -4,12 +4,14 @@
 	"description": "A semantic-release plugin to automate releases from a repository root.",
 	"private": true,
 	"scripts": {
-		"preinstall": "npx npm-force-resolutions",
-		"install:safe": "npm install --legacy-peer-deps --node-gyp=./node_modules/.bin/node-gyp",
-		"clean": "rm -rf node_modules dist package-lock.json",
+		"package-lock:install": "npm install --package-lock-only --ignore-scripts",
+		"package-lock:fix": "node -e \"const fs = require('fs'); const f = 'package-lock.json'; const c = fs.readFileSync(f, 'utf8').trimEnd(); fs.writeFileSync(f, c + '\\n');\"",
+		"clean": "rm -rf node_modules",
 		"clean-cache": "npm cache clean --force",
 		"build": "echo 'Nothing to build'",
-		"reset": "npm run clean && npm install --ignore-scripts --package-lock-only && npm install"
+		"install:clean": "npm run clean && npm run package-lock:install && npm install",
+		"install:safe": "npm install --legacy-peer-deps --node-gyp=./node_modules/.bin/node-gyp",
+		"postinstall": "npm run package-lock:fix && printf '\\033[1;32m%s:\\033[0m\\033[0;32m %s\\033[0m\n' 'Installation complete' 'Run `npm run build` to build the project.'"
 	},
 	"dependencies": {
 		"@semantic-release/changelog": "^6.0.3",
